@@ -1,18 +1,18 @@
-from .symbol import ISymbol, T
+from .symbol import ISymbol, SymbolType, WildcardSymbol
 
 from typing import List, Generic
 
 
-class Condition(Generic[T]):
+class Condition(Generic[SymbolType]):
     """
     A condition consists of an ordered set of symbols.
      A condition can match to a given situation.
     """
 
-    def __init__(self, condition: List[ISymbol[T]]):
+    def __init__(self, condition: List[ISymbol[SymbolType]]):
         self._condition = condition
 
-    def matches(self, situation: List[T]) -> bool:
+    def matches(self, situation: List[SymbolType]) -> bool:
         """
         Checks this condition against the situation.
         :param situation: The situation to check against.
@@ -26,8 +26,28 @@ class Condition(Generic[T]):
 
         return True
 
+    def is_more_general(self, other) -> bool:
+        """
+        Checks whether this condition is more general than another condition.
+        :param other: The condition to check against.
+        :raises: AssertionError if other has not the same length.
+        :return: Whether this condition is more general.
+        """
+        assert (len(self.condition) == len(other.condition))
+
+        result = False
+
+        for i in range(len(self.condition)):
+            if self.condition[i] != other.condition[i]:
+                if not isinstance(self.condition[i], WildcardSymbol):
+                    return False
+                else:
+                    result = True
+
+        return result
+
     @property
-    def condition(self) -> List[ISymbol[T]]:
+    def condition(self) -> List[ISymbol[SymbolType]]:
         return self._condition
 
     def __repr__(self):

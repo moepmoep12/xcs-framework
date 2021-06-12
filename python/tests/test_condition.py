@@ -35,4 +35,20 @@ class TestCondition(TestCase):
         self.assertFalse(c1 == c3)
         self.assertFalse(c1 == c4)
 
+    def test_is_more_general(self):
+        from xcs.condition import Condition
+        from xcs.symbol import Symbol, WildcardSymbol
+        c1: Condition = Condition([Symbol('1'), Symbol('0'), Symbol('1')])
+        c2: Condition = Condition([WildcardSymbol(), Symbol('0'), Symbol('1')])
+        c3: Condition = Condition([Symbol('1'), Symbol('0'), WildcardSymbol()])
+        c4: Condition = Condition([Symbol('1'), WildcardSymbol()])
 
+        self.assertFalse(c1.is_more_general(c2))
+        self.assertTrue(c2.is_more_general(c1))
+        self.assertFalse(c1.is_more_general(c3))
+        self.assertTrue(c3.is_more_general(c1))
+        self.assertFalse(c3.is_more_general(c2))
+        self.assertFalse(c2.is_more_general(c3))
+
+        with self.assertRaises(AssertionError):
+            c4.is_more_general(c1)

@@ -1,18 +1,19 @@
 from typing import TypeVar, Generic
 
-from .condition import Condition, T
+from .condition import Condition, SymbolType
 
-A = TypeVar('A')
+# The datatype for actions
+ActionType = TypeVar('ActionType')
 
 
-class Classifier(Generic[T, A]):
+class Classifier(Generic[SymbolType, ActionType]):
     """
     A classifier represents a rule of the form 'if CONDITION then ACTION'.
     """
 
-    def __init__(self, condition: Condition[T], action: A):
-        self._condition: Condition[T] = condition
-        self._action: A = action
+    def __init__(self, condition: Condition[SymbolType], action: ActionType):
+        self._condition: Condition[SymbolType] = condition
+        self._action: ActionType = action
         self._experience: int = 0
         self._fitness: float = 0
         self._numerosity: int = 1
@@ -20,16 +21,16 @@ class Classifier(Generic[T, A]):
         self._epsilon: float = 0
 
     @property
-    def condition(self) -> Condition[T]:
+    def condition(self) -> Condition[SymbolType]:
         """
         :return: The condition under which this classifier is active.
         """
         return self._condition
 
     @property
-    def action(self) -> A:
+    def action(self) -> ActionType:
         """
-        :return: The suggested action to take if the condition is met.
+        :return: The suggested action (or classification) to take if the condition is met.
         """
         return self._action
 
@@ -70,6 +71,7 @@ class Classifier(Generic[T, A]):
     def numerosity(self) -> int:
         """
         :return: How many classifier this classifier represents.
+        Increases by the process of subsumption.
         """
         return self._numerosity
 
@@ -81,4 +83,5 @@ class Classifier(Generic[T, A]):
         return self._experience
 
     def __repr__(self):
-        return f"{str(self.condition)} : {self.action}"
+        return f"{str(self.condition)} : {self.action}, F:{self.fitness}, P:{self.prediction}, E:{self.epsilon}," \
+               f" N:{self.numerosity}, exp:{self.experience} "
