@@ -1,0 +1,2 @@
+class XCS(object):
+    pass
