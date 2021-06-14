@@ -1,27 +1,36 @@
-from .symbol import ISymbol, SymbolType, WildcardSymbol
+from .symbol import ISymbol, WildcardSymbol
+from .state import State
 
-from typing import List, Generic
+from typing import Collection, Generic, TypeVar, Tuple
+
+SymbolType = TypeVar('SymbolType')
 
 
 class Condition(Generic[SymbolType]):
     """
     A condition consists of an ordered set of symbols.
-     A condition can match to a given situation.
+     A condition can match to a given state.
     """
 
-    def __init__(self, condition: List[ISymbol[SymbolType]]):
+    def __init__(self, condition: Collection[ISymbol[SymbolType]]):
+        if len(condition) == 0:
+            raise ValueError("The condition is empty")
+        for symbol in condition:
+            if not isinstance(symbol, ISymbol):
+                raise ValueError(f"Symbol {symbol} is not of type ISymbol")
+
         self._condition = condition
 
-    def matches(self, situation: List[SymbolType]) -> bool:
+    def matches(self, state: State[SymbolType]) -> bool:
         """
         Checks this condition against the situation.
-        :param situation: The situation to check against.
+        :param state: The state to check against.
         :return: Whether the condition is met in the given situation.
         """
-        assert (len(situation) == len(self._condition))
+        assert (len(state) == len(self._condition))
 
         for i in range(len(self._condition)):
-            if not self._condition[i].matches(situation[i]):
+            if not self._condition[i].matches(state[i]):
                 return False
 
         return True
@@ -47,8 +56,8 @@ class Condition(Generic[SymbolType]):
         return result
 
     @property
-    def condition(self) -> List[ISymbol[SymbolType]]:
-        return self._condition
+    def condition(self) -> Tuple[ISymbol[SymbolType]]:
+        return tuple(self._condition)
 
     def __repr__(self):
         result: str = '['
@@ -62,5 +71,22 @@ class Condition(Generic[SymbolType]):
     def __eq__(self, o: object) -> bool:
         return self.condition == getattr(o, 'condition', None)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: int):
+        if not isinstance(item, int):
+            raise KeyError(f"Key {item} is not of type int")
+
+        if item < 0 or item >= len(self):
+            raise KeyError(f"Key {item} is out of range {len(self)}")
         return self.condition[item]
+
+    def __setitem__(self, key: int, value: ISymbol[SymbolType]):
+        if not isinstance(key, int):
+            raise KeyError(f"Key {key} is not of type int")
+
+        if key < 0 or key >= len(self):
+            raise KeyError(f"Key {key} is out of range {len(self)}")
+
+        if not isinstance(value, ISymbol):
+            raise ValueError(f"Value {value} is not of type ISymbol")
+
+        self._condition[key] = value
