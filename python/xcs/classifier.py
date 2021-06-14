@@ -1,8 +1,10 @@
 from typing import TypeVar, Generic
 
-from .condition import Condition, SymbolType
+from .condition import Condition
 
-# The datatype for actions
+# The data type for symbols
+SymbolType = TypeVar('SymbolType')
+# The data type for actions
 ActionType = TypeVar('ActionType')
 
 
@@ -12,6 +14,13 @@ class Classifier(Generic[SymbolType, ActionType]):
     """
 
     def __init__(self, condition: Condition[SymbolType], action: ActionType):
+        if condition is None:
+            raise ValueError("Condition argument is None")
+        if not isinstance(condition, Condition):
+            raise ValueError(f"Condition argument is not of type Condition but {type(condition)}")
+        if action is None:
+            raise ValueError("Action argument is None")
+
         self._condition: Condition[SymbolType] = condition
         self._action: ActionType = action
         self._experience: int = 0
