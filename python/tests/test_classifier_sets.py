@@ -3,7 +3,7 @@ from unittest import TestCase
 
 class TestClassifierSet(TestCase):
 
-    def test_set(self):
+    def test_classifier_set(self):
         from xcs.classifier_sets import ClassifierSet
         from xcs.classifier import Classifier
         from xcs.condition import Condition

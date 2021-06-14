@@ -1,6 +1,11 @@
-from typing import Set, List, Iterable
+from typing import Set, List, Iterable, TypeVar
 
-from .classifier import Classifier, ActionType, SymbolType
+from .classifier import Classifier
+
+# The data type for symbols
+SymbolType = TypeVar('SymbolType')
+# The data type for actions
+ActionType = TypeVar('ActionType')
 
 
 class ClassifierSet(List[Classifier[SymbolType, ActionType]]):
@@ -16,6 +21,9 @@ class ClassifierSet(List[Classifier[SymbolType, ActionType]]):
 
 
 class Population(ClassifierSet[SymbolType, ActionType]):
+    """
+    A population is a set of classifier that represent the knowledge base of the LCS.
+    """
 
     def __init__(self, max_size: int, *args):
         assert (len(*args) <= max_size)
