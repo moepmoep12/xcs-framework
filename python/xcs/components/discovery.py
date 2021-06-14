@@ -9,6 +9,7 @@ from xcs.classifier_sets import Population, ClassifierSet
 from xcs.symbol import WildcardSymbol
 from xcs.condition import Condition
 from xcs.state import State
+from xcs.selection import IClassifierSelectionStrategy
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -19,24 +20,30 @@ ActionType = TypeVar('ActionType')
 class IDiscoveryComponent(ABC):
 
     @abstractmethod
-    def discover(self, population: Population[SymbolType, ActionType], state: State[SymbolType],
-                 classifier_set: ClassifierSet[SymbolType, ActionType]) -> ClassifierSet[SymbolType, ActionType]:
+    def discover(self, state: State[SymbolType], classifier_set: ClassifierSet[SymbolType, ActionType]):
+        """
+        Discovers new classifier from a classifier set in a specific state.
+        :param state: The current state.
+        :param classifier_set: The set used for generating new classifier.
+        """
         pass
 
 
 class GeneticAlgorithm(IDiscoveryComponent):
 
+    # TO-DO: Add constructor arguments
     def __init__(self):
         self._mutation_rate = 0
         self._mutate_action = False
         self._available_actions: List[ActionType] = []
+        self._selection_strategy: IClassifierSelectionStrategy = None
+        self._fitness_reduction: float = 0.1
 
     @overrides
-    def discover(self, population: Population[SymbolType, ActionType], state: State[SymbolType],
-                 classifier_set: ClassifierSet[SymbolType, ActionType]) -> ClassifierSet[SymbolType, ActionType]:
+    def discover(self, state: State[SymbolType], classifier_set: ClassifierSet[SymbolType, ActionType]):
 
-        parent1 = self.choose_parent(population)
-        parent2 = self.choose_parent(population)
+        parent1 = self._choose_parent(classifier_set)
+        parent2 = self._choose_parent(classifier_set)
 
         child1 = self._generate_child(parent1)
         child2 = self._generate_child(parent2)
@@ -49,19 +56,26 @@ class GeneticAlgorithm(IDiscoveryComponent):
 
     @staticmethod
     def _generate_child(parent: Classifier[SymbolType, ActionType]) -> Classifier[SymbolType, ActionType]:
-        child = copy.deepcopy(parent)
+        """
+        Generates a child classifier from a parent. Uses deep copy.
+        """
+        child = Classifier(copy.deepcopy(parent.condition), copy.deepcopy(parent.action))
         child.fitness = parent.fitness / parent.numerosity
-        child.numerosity = 1
-        child.experience = 0
+        child.prediction = parent.prediction
+        child.epsilon = parent.epsilon
         return child
 
     def _choose_parent(self, classifier_set: ClassifierSet[SymbolType, ActionType]) \
             -> Classifier[SymbolType, ActionType]:
-        parent = None
-
-        return parent
+        """
+        Chooses a classifier as parent with the given SelectionStrategy and the fitness as criteria.
+        """
+        return self._selection_strategy.select_classifier(classifier_set, lambda cl: cl.fitness)
 
     def _mutate(self, classifier: Classifier[SymbolType, ActionType], state: State[SymbolType]):
+        """
+        Mutates a classifier by changing some of its condition symbols and the action if enabled.
+        """
         for i in range(len(classifier.condition)):
             if random.random() < self._mutation_rate:
                 if isinstance(classifier.condition[i], WildcardSymbol):
@@ -76,9 +90,26 @@ class GeneticAlgorithm(IDiscoveryComponent):
                 classifier.action = actions[random.randint(0, len(actions) - 1)]
 
     def _crossover(self, cl1: Classifier[SymbolType, ActionType], cl2: Classifier[SymbolType, ActionType]):
-        pass
+        """
+        Performs the crossover operation on two classifier.
 
-    def _two_point_crossover(self, cl1: Classifier[SymbolType, ActionType], cl2: Classifier[SymbolType, ActionType]):
+        """
+        performed_crossover = False
+
+        # TO-DO: Perform crossover according to strategy
+
+        if performed_crossover:
+            cl1.prediction = cl2.prediction = (cl1.prediction + cl2.prediction) / 2
+            cl1.epsilon = cl2.epsilon = (cl1.epsilon + cl2.epsilon) / 2
+            cl1.fitness = cl2.fitness = (cl1.fitness + cl2.fitness) / 2
+
+        cl1.fitness *= self._fitness_reduction
+        cl2.fitness *= self._fitness_reduction
+
+    def _two_point_crossover(self,
+                             cl1: Classifier[SymbolType, ActionType],
+                             cl2: Classifier[SymbolType, ActionType]) -> bool:
+
         from_index = random.randint(0, len(cl1.condition) - 1)
         to_index = random.randint(0, len(cl1.condition) - 1)
 
@@ -92,6 +123,8 @@ class GeneticAlgorithm(IDiscoveryComponent):
     @staticmethod
     def _swap_symbols(condition1: Condition[SymbolType], condition2: Condition[SymbolType],
                       from_index: int, to_index: int):
-
+        """
+        Swaps the symbols of two classifier.
+        """
         for i in range(from_index + 1, to_index):
             condition1[i], condition2[i] = condition2[i], condition1[i]
