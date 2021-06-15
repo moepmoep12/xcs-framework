@@ -12,10 +12,13 @@ ActionType = TypeVar('ActionType')
 
 class XCS(Generic[SymbolType, ActionType]):
 
+    # TO-DO: 1.Instantiate with a list of all available actions?
+    #        2.Optional initial population?
     def __init__(self,
                  performance_component: IPerformanceComponent,
                  discovery_component: IDiscoveryComponent,
-                 learning_component: ILearningComponent):
+                 learning_component: ILearningComponent,
+                 covering_component: ICoveringComponent):
 
         if not isinstance(performance_component, IPerformanceComponent):
             raise ValueError(f"{performance_component} is not of type {type(IPerformanceComponent)}")
@@ -23,10 +26,13 @@ class XCS(Generic[SymbolType, ActionType]):
             raise ValueError(f"{discovery_component} is not of type {type(IDiscoveryComponent)}")
         if not isinstance(learning_component, ILearningComponent):
             raise ValueError(f"{learning_component} is not of type {type(ILearningComponent)}")
+        if not isinstance(covering_component, ICoveringComponent):
+            raise ValueError(f"{covering_component} is not of type {type(ICoveringComponent)}")
 
         self._performance_component: IPerformanceComponent = performance_component
         self._discovery_component: IDiscoveryComponent = discovery_component
         self._learning_component: ILearningComponent = learning_component
+        self._covering_component: ICoveringComponent = covering_component
         self._population: Population[SymbolType, ActionType] = None
 
     def explore(self, state: State[SymbolType, ActionType]) -> ActionType:
@@ -38,8 +44,8 @@ class XCS(Generic[SymbolType, ActionType]):
         """
         match_set = self._performance_component.generate_match_set(self._population, state)
         if len(match_set) == 0:
-            # TO-DO: COVERING
-            pass
+            # TO-DO: passing available actions
+            match_set.extend(self.covering_component.covering_operation(state, []))
 
         action: ActionType = self._performance_component.choose_action(match_set)
 
@@ -77,3 +83,14 @@ class XCS(Generic[SymbolType, ActionType]):
             raise ValueError(f"{value} is not of type {type(ILearningComponent)}")
 
         self._learning_component = value
+
+    @property
+    def covering_component(self) -> ICoveringComponent:
+        return self._covering_component
+
+    @covering_component.setter
+    def covering_component(self, value: ICoveringComponent):
+        if not isinstance(value, ICoveringComponent):
+            raise ValueError(f"{value} is not of type {type(ICoveringComponent)}")
+
+        self._covering_component = value
