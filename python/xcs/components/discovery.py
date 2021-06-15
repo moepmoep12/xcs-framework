@@ -22,9 +22,9 @@ class IDiscoveryComponent(ABC):
     @abstractmethod
     def discover(self, state: State[SymbolType], classifier_set: ClassifierSet[SymbolType, ActionType]):
         """
-        Discovers new classifier from a classifier set in a specific state.
+        Discovers new classifier based on existing classifier in a specific state.
         :param state: The current state.
-        :param classifier_set: The set used for generating new classifier.
+        :param classifier_set: The set used for generating new classifier (== current knowledge base).
         """
         pass
 
@@ -124,31 +124,50 @@ class GeneticAlgorithm(IDiscoveryComponent):
                              cl2: Classifier[SymbolType, ActionType]) -> bool:
 
         from_index = random.randint(0, len(cl1.condition) - 1)
-        self._swap_symbols(cl1.condition, cl2.condition, from_index, len(cl1.condition))
-
-        return from_index < len(cl1.condition)
+        return self._swap_symbols(cl1.condition, cl2.condition, from_index, len(cl1.condition))
 
     def _two_point_crossover(self,
                              cl1: Classifier[SymbolType, ActionType],
                              cl2: Classifier[SymbolType, ActionType]) -> bool:
 
-        from_index = random.randint(0, len(cl1.condition))
-        to_index = random.randint(0, len(cl1.condition))
+        from_index = random.randint(0, len(cl1.condition) - 1)
+        to_index = random.randint(0, len(cl1.condition) - 1)
 
         if from_index > to_index:
             from_index, to_index = to_index, from_index
 
-        self._swap_symbols(cl1.condition, cl2.condition, from_index, to_index)
-
-        return to_index - from_index > 0
+        return self._swap_symbols(cl1.condition, cl2.condition, from_index, to_index)
 
     @staticmethod
     def _swap_symbols(condition1: Condition[SymbolType], condition2: Condition[SymbolType],
-                      from_index: int, to_index: int):
+                      from_index: int, to_index: int) -> bool:
         """
         Swaps the symbols of two classifier.
         :param from_index: Starting index (inclusive).
-        :param to_index: End index (exclusive).
+        :param to_index: End index (inclusive).
+        :return: Whether anything was swapped.
         """
-        for i in range(from_index + 1, to_index):
+        if condition1 is None or condition2 is None:
+            raise ValueError(f"Tried swapping a condition that is None")
+        if len(condition1) == 0:
+            raise ValueError(f"Cannot swap a empty condition {condition1}")
+        if len(condition2) == 0:
+            raise ValueError(f"Cannot swap a empty condition {condition2}")
+        if len(condition1) != len(condition2):
+            raise ValueError(f"Condition length of {len(condition1)} != {len(condition2)}")
+        if condition1 is condition2:
+            raise ValueError(f"Tried swapping cond1:{condition1} with itself cond2:{condition2}")
+        if from_index < 0 or from_index >= len(condition1):
+            raise ValueError(f"from_index {from_index} is out of range [0,{len(condition1) - 1}]")
+        if to_index < 0 or to_index >= len(condition1):
+            raise ValueError(f"to_index {to_index} is out of range [0,{len(condition1) - 1}]")
+        if from_index > to_index:
+            raise ValueError(f"from_index {from_index} > {to_index} to_index")
+
+        swapped = False
+
+        for i in range(from_index, to_index + 1):
             condition1[i], condition2[i] = condition2[i], condition1[i]
+            swapped = True
+
+        return swapped
