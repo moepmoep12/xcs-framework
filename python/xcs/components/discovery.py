@@ -70,7 +70,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
         """
         Chooses a classifier as parent with the given SelectionStrategy and the fitness as criteria.
         """
-        return self._selection_strategy.select_classifier(classifier_set, lambda cl: cl.fitness)
+        return classifier_set[self._selection_strategy.select_classifier(classifier_set, lambda cl: cl.fitness)]
 
     def _mutate(self, classifier: Classifier[SymbolType, ActionType], state: State[SymbolType]):
         """
@@ -106,12 +106,34 @@ class GeneticAlgorithm(IDiscoveryComponent):
         cl1.fitness *= self._fitness_reduction
         cl2.fitness *= self._fitness_reduction
 
-    def _two_point_crossover(self,
+    def _uniform_crossover(self,
+                           cl1: Classifier[SymbolType, ActionType],
+                           cl2: Classifier[SymbolType, ActionType]) -> bool:
+
+        performed_crossover = False
+
+        for i in range(len(cl1.condition)):
+            if random.random() >= 0.5:
+                self._swap_symbols(cl1.condition, cl2.condition, i, i)
+                performed_crossover = True
+
+        return performed_crossover
+
+    def _one_point_crossover(self,
                              cl1: Classifier[SymbolType, ActionType],
                              cl2: Classifier[SymbolType, ActionType]) -> bool:
 
         from_index = random.randint(0, len(cl1.condition) - 1)
-        to_index = random.randint(0, len(cl1.condition) - 1)
+        self._swap_symbols(cl1.condition, cl2.condition, from_index, len(cl1.condition))
+
+        return from_index < len(cl1.condition)
+
+    def _two_point_crossover(self,
+                             cl1: Classifier[SymbolType, ActionType],
+                             cl2: Classifier[SymbolType, ActionType]) -> bool:
+
+        from_index = random.randint(0, len(cl1.condition))
+        to_index = random.randint(0, len(cl1.condition))
 
         if from_index > to_index:
             from_index, to_index = to_index, from_index
@@ -125,6 +147,8 @@ class GeneticAlgorithm(IDiscoveryComponent):
                       from_index: int, to_index: int):
         """
         Swaps the symbols of two classifier.
+        :param from_index: Starting index (inclusive).
+        :param to_index: End index (exclusive).
         """
         for i in range(from_index + 1, to_index):
             condition1[i], condition2[i] = condition2[i], condition1[i]
