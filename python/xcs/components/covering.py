@@ -42,7 +42,7 @@ class CoveringComponent(ICoveringComponent):
 
     def __init__(self, wild_card_probability: float):
         """
-        :param wild_card_probability: Must be float between in range [0.0, 1.0]
+        :param wild_card_probability: Must be float in range [0.0, 1.0]
         """
         if not isinstance(wild_card_probability, float):
             raise ValueError(f"{wild_card_probability} is not of type float")
@@ -58,7 +58,7 @@ class CoveringComponent(ICoveringComponent):
     @wildcard_probability.setter
     def wildcard_probability(self, value: float):
         """
-        :param value: Must be float between in range [0.0, 1.0]
+        :param value: Must be float in range [0.0, 1.0]
         """
         if not isinstance(value, float):
             raise ValueError(f"{value} is not of type float")
