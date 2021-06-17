@@ -18,6 +18,7 @@ class ISymbol(Generic[SymbolType], ABC):
     def matches(self, value: SymbolType) -> bool:
         """
         Checks whether this symbol matches against a given value.
+
         :param value: The value to check against.
         :return: Whether this symbol matches to the given value.
         """
@@ -46,6 +47,11 @@ class Symbol(ISymbol[SymbolType]):
     """
 
     def __init__(self, value: SymbolType):
+        """
+        :param value: The value of this symbol.
+        :raises:
+            NoneValueException: If value is None.
+        """
         if value is None:
             raise NoneValueException(variable_name='value')
         self._value: SymbolType = value

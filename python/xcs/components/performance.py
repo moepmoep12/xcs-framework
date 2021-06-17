@@ -13,12 +13,14 @@ ActionType = TypeVar('ActionType')
 
 class IPerformanceComponent(ABC):
 
+    # TO-DO: Does is it have to be a population? maybe generic ClassifierSet instead?
     @abstractmethod
     def generate_match_set(self, population: Population[SymbolType, ActionType], state: State[SymbolType]) -> \
             MatchSet[SymbolType, ActionType]:
         """
         Generates a match set to given population in a specific state. A match set consists of all classifiers
         that match to the given situation.
+
         :param population: The set of classifiers to be considered.
         :param state: The state to check against.
         :return: All classifiers from the population that match to the situation.

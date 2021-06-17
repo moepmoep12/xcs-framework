@@ -2,9 +2,11 @@ from abc import abstractmethod, ABC
 from typing import List, TypeVar, Callable
 from overrides import overrides
 import random
+from sys import maxsize as max_int
 
 from xcs.classifier_sets import ClassifierSet
 from xcs.classifier import Classifier
+from xcs.exceptions import OutOfRangeException, WrongStrictTypeException
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -26,6 +28,7 @@ class IClassifierSelectionStrategy(ABC):
                           score_function: score_function_type) -> int:
         """
         Chooses a single classifier from the given set.
+
         :param classifier_set: The set to choose from.
         :param score_function: A function that returns the score of a classifier.
         :return: The index of chosen classifier.
@@ -36,6 +39,18 @@ class IClassifierSelectionStrategy(ABC):
 class TournamentSelection(IClassifierSelectionStrategy):
 
     def __init__(self, tournament_size: int):
+        """
+        :param tournament_size: How many classifier are competing. Must be int in range [1, max_int]
+        :raises:
+            WrongStrictTypeException: If tournament_size is not an int.
+            OutOfRangeException: If tournament_size is not in range [1, max_int].
+        """
+
+        if not isinstance(tournament_size, int):
+            raise WrongStrictTypeException(int.__name__, type(tournament_size).__name__)
+        if tournament_size < 1 or tournament_size > max_int:
+            raise OutOfRangeException(1, max_int, tournament_size)
+
         self._tournament_size = tournament_size
 
     @overrides

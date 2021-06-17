@@ -58,6 +58,7 @@ class Classifier(Generic[SymbolType, ActionType]):
         """
         return self._fitness
 
+    # To-Do: Restrict to positive values only?
     @fitness.setter
     def fitness(self, value: float):
         self._fitness = value
@@ -80,6 +81,7 @@ class Classifier(Generic[SymbolType, ActionType]):
         """
         return self._epsilon
 
+    # To-Do: Restrict to range?
     @epsilon.setter
     def epsilon(self, value: float):
         self._epsilon = value

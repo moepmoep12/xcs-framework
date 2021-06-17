@@ -3,6 +3,7 @@ from typing import TypeVar, Generic
 from xcs.state import State
 from xcs.classifier_sets import Population
 from xcs.components import *
+from xcs.exceptions import *
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -20,19 +21,10 @@ class XCS(Generic[SymbolType, ActionType]):
                  learning_component: ILearningComponent,
                  covering_component: ICoveringComponent):
 
-        if not isinstance(performance_component, IPerformanceComponent):
-            raise ValueError(f"{performance_component} is not of type {type(IPerformanceComponent)}")
-        if not isinstance(discovery_component, IDiscoveryComponent):
-            raise ValueError(f"{discovery_component} is not of type {type(IDiscoveryComponent)}")
-        if not isinstance(learning_component, ILearningComponent):
-            raise ValueError(f"{learning_component} is not of type {type(ILearningComponent)}")
-        if not isinstance(covering_component, ICoveringComponent):
-            raise ValueError(f"{covering_component} is not of type {type(ICoveringComponent)}")
-
-        self._performance_component: IPerformanceComponent = performance_component
-        self._discovery_component: IDiscoveryComponent = discovery_component
-        self._learning_component: ILearningComponent = learning_component
-        self._covering_component: ICoveringComponent = covering_component
+        self.performance_component: IPerformanceComponent = performance_component
+        self.discovery_component: IDiscoveryComponent = discovery_component
+        self.learning_component: ILearningComponent = learning_component
+        self.covering_component: ICoveringComponent = covering_component
         self._population: Population[SymbolType, ActionType] = None
 
     def explore(self, state: State[SymbolType, ActionType]) -> ActionType:
@@ -58,7 +50,7 @@ class XCS(Generic[SymbolType, ActionType]):
     @performance_component.setter
     def performance_component(self, value: IPerformanceComponent):
         if not isinstance(value, IPerformanceComponent):
-            raise ValueError(f"{value} is not of type {type(IPerformanceComponent)}")
+            raise WrongSubTypeException(IPerformanceComponent.__name__, type(value).__name__)
 
         self._performance_component = value
 

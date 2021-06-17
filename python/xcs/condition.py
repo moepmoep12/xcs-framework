@@ -17,13 +17,10 @@ class Condition(Generic[SymbolType]):
         """
         :param condition: A collection of ISymbol representing the value of this condition.
         :raises:
-            NoneValueException: If condition is None.
             EmptyCollectionException: If condition is empty.
             WrongSubTypeException: If one element of condition is not a ISymbol.
         """
-        if condition is None:
-            raise NoneValueException(variable_name='condition')
-        if len(condition) == 0:
+        if condition is None or len(condition) == 0:
             raise EmptyCollectionException(variable_name='condition')
 
         # check if symbols are valid
@@ -35,7 +32,8 @@ class Condition(Generic[SymbolType]):
 
     def matches(self, state: State[SymbolType]) -> bool:
         """
-        Checks this condition against the situation.
+        Checks whether this condition matches to the given state.
+
         :param state: The state to check against.
         :return: Whether the condition is met in the given situation.
         :raises:
@@ -52,6 +50,7 @@ class Condition(Generic[SymbolType]):
     def is_more_general(self, other) -> bool:
         """
         Checks whether this condition is more general than another condition.
+
         :param other: The condition to check against.
         :raises: AssertionError if other has not the same length.
         :return: Whether this condition is more general.

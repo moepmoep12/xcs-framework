@@ -5,9 +5,9 @@ class TestCondition(TestCase):
     def test_init(self):
         from xcs.condition import Condition
         from xcs.symbol import Symbol
-        from xcs.exceptions import NoneValueException, EmptyCollectionException, WrongSubTypeException
+        from xcs.exceptions import EmptyCollectionException, WrongSubTypeException
 
-        with self.assertRaises(NoneValueException):
+        with self.assertRaises(EmptyCollectionException):
             Condition(None)
 
         with self.assertRaises(EmptyCollectionException):

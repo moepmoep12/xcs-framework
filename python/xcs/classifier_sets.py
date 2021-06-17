@@ -22,7 +22,7 @@ class ClassifierSet(List[Classifier[SymbolType, ActionType]]):
 
 class Population(ClassifierSet[SymbolType, ActionType]):
     """
-    A population is a set of classifier that represent the knowledge base of the LCS.
+    A population is a set of classifier that represent the knowledge base of a LCS.
     """
 
     def __init__(self, max_size: int, *args):
