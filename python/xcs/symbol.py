@@ -2,6 +2,8 @@ from abc import abstractmethod, ABC
 from typing import TypeVar, Generic
 from overrides import overrides
 
+from .exceptions import NoneValueException
+
 SymbolType = TypeVar('SymbolType')
 WILDCARD_CHAR = '#'
 
@@ -45,7 +47,7 @@ class Symbol(ISymbol[SymbolType]):
 
     def __init__(self, value: SymbolType):
         if value is None:
-            raise ValueError(f"Value is None.")
+            raise NoneValueException(variable_name='value')
         self._value: SymbolType = value
 
     @overrides

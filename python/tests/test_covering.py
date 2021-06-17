@@ -4,27 +4,29 @@ from unittest import TestCase
 class TestCoveringComponent(TestCase):
     def test_set_wildcard_probability(self):
         from xcs.components.covering import CoveringComponent
+        from xcs.exceptions import OutOfRangeException, WrongStrictTypeException
         covering_component = CoveringComponent(0.0)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(OutOfRangeException):
             covering_component.wildcard_probability = -1.0
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(WrongStrictTypeException):
             covering_component.wildcard_probability = 'a'
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(OutOfRangeException):
             covering_component.wildcard_probability = 1.5
 
     def test_wildcard_probability_constructor(self):
         from xcs.components.covering import CoveringComponent
+        from xcs.exceptions import OutOfRangeException, WrongStrictTypeException
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(OutOfRangeException):
             CoveringComponent(wild_card_probability=-1.0)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(WrongStrictTypeException):
             CoveringComponent(wild_card_probability='a')
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(OutOfRangeException):
             CoveringComponent(wild_card_probability=1.5)
 
     def test_covering_operation_no_wildcard(self):

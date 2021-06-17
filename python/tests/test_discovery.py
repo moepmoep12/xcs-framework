@@ -75,6 +75,7 @@ class TestGeneticAlgorithm(TestCase):
         from xcs.condition import Condition
         from xcs.symbol import Symbol, WildcardSymbol
         from xcs.components.discovery import GeneticAlgorithm
+        from xcs.exceptions import NoneValueException, EmptyCollectionException, OutOfRangeException
         import copy
         ga = GeneticAlgorithm()
         symbols1 = [Symbol('1'), WildcardSymbol(), Symbol('1')]
@@ -87,11 +88,11 @@ class TestGeneticAlgorithm(TestCase):
         condition4: Condition[str] = condition1
 
         # None condition
-        with self.assertRaises(ValueError):
+        with self.assertRaises(NoneValueException):
             ga._swap_symbols(None, condition1, 0, 0)
 
         # empty condition
-        with self.assertRaises(ValueError):
+        with self.assertRaises(EmptyCollectionException):
             ga._swap_symbols(condition0, condition1, 0, 0)
 
         # different length
@@ -103,12 +104,12 @@ class TestGeneticAlgorithm(TestCase):
             ga._swap_symbols(condition1, condition4, 0, 0)
 
         # invalid from_index
-        with self.assertRaises(ValueError):
+        with self.assertRaises(OutOfRangeException):
             ga._swap_symbols(condition1, condition3, -1, 0)
             ga._swap_symbols(condition1, condition3, 3, 0)
 
         # invalid to_index
-        with self.assertRaises(ValueError):
+        with self.assertRaises(OutOfRangeException):
             ga._swap_symbols(condition1, condition3, 0, -1)
             ga._swap_symbols(condition1, condition3, 2, 3)
 

@@ -17,11 +17,12 @@ class TestClassifier(TestCase):
 
     def test_init(self):
         from xcs.classifier import Classifier
+        from xcs.exceptions import NoneValueException, WrongSubTypeException
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(NoneValueException):
             Classifier(None, 1)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(WrongSubTypeException):
             Classifier('a', 1)
 
     def test_deep_copy(self):

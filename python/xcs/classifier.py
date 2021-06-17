@@ -1,6 +1,7 @@
 from typing import TypeVar, Generic
 
 from .condition import Condition
+from .exceptions import NoneValueException, WrongSubTypeException
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -14,12 +15,19 @@ class Classifier(Generic[SymbolType, ActionType]):
     """
 
     def __init__(self, condition: Condition[SymbolType], action: ActionType):
+        """
+        :param condition: The condition under which this classifier is active.
+        :param action: The action to execute if this classifier is active.
+        :raises:
+            NoneValueException: If any of the required arguments is None.
+            WrongSubTypeException: If the condition is not of type Condition.
+        """
         if condition is None:
-            raise ValueError("Condition argument is None")
-        if not isinstance(condition, Condition):
-            raise ValueError(f"Condition argument is not of type Condition but {type(condition)}")
+            raise NoneValueException('condition')
         if action is None:
-            raise ValueError("Action argument is None")
+            raise NoneValueException('action')
+        if not isinstance(condition, Condition):
+            raise WrongSubTypeException(Condition.__name__, type(condition).__name__)
 
         self._condition: Condition[SymbolType] = condition
         self._action: ActionType = action

@@ -26,6 +26,11 @@ class Population(ClassifierSet[SymbolType, ActionType]):
     """
 
     def __init__(self, max_size: int, *args):
+        """
+        :param max_size: The maximum size of the population.
+        :raises:
+            AssertionError: If the initial collection is greater than the maximum size.
+        """
         assert (len(*args) <= max_size)
         super(Population, self).__init__(*args)
         self._max_size = max_size
@@ -49,8 +54,10 @@ class Population(ClassifierSet[SymbolType, ActionType]):
 
 
 class MatchSet(ClassifierSet[SymbolType, ActionType]):
+    # TO-DO
     pass
 
 
 class ActionSet(ClassifierSet[SymbolType, ActionType]):
+    # TO-DO
     pass

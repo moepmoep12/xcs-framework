@@ -5,11 +5,15 @@ class TestCondition(TestCase):
     def test_init(self):
         from xcs.condition import Condition
         from xcs.symbol import Symbol
+        from xcs.exceptions import NoneValueException, EmptyCollectionException, WrongSubTypeException
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(NoneValueException):
+            Condition(None)
+
+        with self.assertRaises(EmptyCollectionException):
             Condition([])
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(WrongSubTypeException):
             Condition([Symbol('1'), 'A'])
 
     def test_matches(self):
@@ -66,32 +70,34 @@ class TestCondition(TestCase):
 
     def test_get_item(self):
         from xcs.condition import Condition
-        from xcs.symbol import Symbol, WildcardSymbol
+        from xcs.symbol import Symbol
+        from xcs.exceptions import OutOfRangeException, WrongStrictTypeException
         symbol = Symbol('1')
         c: Condition = Condition([symbol, Symbol('0'), Symbol('1')])
 
         self.assertTrue(c[0] == symbol)
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(OutOfRangeException):
             c[-1]
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(WrongStrictTypeException):
             c['a']
 
     def test_set_item(self):
         from xcs.condition import Condition
         from xcs.symbol import Symbol, WildcardSymbol
+        from xcs.exceptions import OutOfRangeException, WrongStrictTypeException, WrongSubTypeException
         c: Condition = Condition([Symbol('1'), Symbol('0'), Symbol('1')])
         c[0] = WildcardSymbol()
 
         self.assertTrue(isinstance(c[0], WildcardSymbol))
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(WrongStrictTypeException):
             c['a'] = WildcardSymbol()
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(OutOfRangeException):
             c[-1] = WildcardSymbol()
             c[3] = WildcardSymbol()
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(WrongSubTypeException):
             c[0] = 42

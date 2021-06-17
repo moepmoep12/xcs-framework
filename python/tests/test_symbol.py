@@ -7,8 +7,9 @@ class TestSymbol(TestCase):
 
     def test_init_symbol(self):
         from xcs.symbol import Symbol
+        from xcs.exceptions import NoneValueException
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(NoneValueException):
             Symbol(None)
 
         Symbol(self.val_str)

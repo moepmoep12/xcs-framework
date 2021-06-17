@@ -5,11 +5,12 @@ import copy
 import random
 
 from xcs.classifier import Classifier
-from xcs.classifier_sets import Population, ClassifierSet
+from xcs.classifier_sets import ClassifierSet
 from xcs.symbol import WildcardSymbol
 from xcs.condition import Condition
 from xcs.state import State
 from xcs.selection import IClassifierSelectionStrategy
+from xcs.exceptions import *
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -146,21 +147,26 @@ class GeneticAlgorithm(IDiscoveryComponent):
         :param from_index: Starting index (inclusive).
         :param to_index: End index (inclusive).
         :return: Whether anything was swapped.
+        :raises:
+            NoneValueException: If any required argument is None.
+            EmptyCollectionException: If any condition is empty.
+            OutOfRangeException: If from_index or to_index is not in range [0, len(condition1) -1]
+            ValueError: If condition1 == condition2 or the conditions have different length.
         """
         if condition1 is None or condition2 is None:
-            raise ValueError(f"Tried swapping a condition that is None")
+            raise NoneValueException('condition1/2')
         if len(condition1) == 0:
-            raise ValueError(f"Cannot swap a empty condition {condition1}")
+            raise EmptyCollectionException('condition1')
         if len(condition2) == 0:
-            raise ValueError(f"Cannot swap a empty condition {condition2}")
+            raise EmptyCollectionException('condition2')
         if len(condition1) != len(condition2):
             raise ValueError(f"Condition length of {len(condition1)} != {len(condition2)}")
         if condition1 is condition2:
             raise ValueError(f"Tried swapping cond1:{condition1} with itself cond2:{condition2}")
         if from_index < 0 or from_index >= len(condition1):
-            raise ValueError(f"from_index {from_index} is out of range [0,{len(condition1) - 1}]")
+            raise OutOfRangeException(0, len(condition1) - 1, from_index)
         if to_index < 0 or to_index >= len(condition1):
-            raise ValueError(f"to_index {to_index} is out of range [0,{len(condition1) - 1}]")
+            raise OutOfRangeException(0, len(condition1) - 1, to_index)
         if from_index > to_index:
             raise ValueError(f"from_index {from_index} > {to_index} to_index")
 

@@ -9,6 +9,7 @@ from xcs.state import State
 from xcs.classifier import Classifier
 from xcs.condition import Condition
 from xcs.symbol import WildcardSymbol, Symbol, ISymbol
+from xcs.exceptions import OutOfRangeException, WrongStrictTypeException
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -43,11 +44,14 @@ class CoveringComponent(ICoveringComponent):
     def __init__(self, wild_card_probability: float):
         """
         :param wild_card_probability: Must be float in range [0.0, 1.0]
+        :raises:
+            WrongStrictTypeException: If wild_card_probability is not a float.
+            OutOfRangeException: If wild_card_probability is not in range [0.0, 1.0].
         """
         if not isinstance(wild_card_probability, float):
-            raise ValueError(f"{wild_card_probability} is not of type float")
+            raise WrongStrictTypeException(float.__name__, type(wild_card_probability).__name__)
         if wild_card_probability < 0.0 or wild_card_probability > 1.0:
-            raise ValueError(f"{wild_card_probability} out of range [0.0, 1.0]")
+            raise OutOfRangeException(0.0, 1.0, wild_card_probability)
 
         self._wildcard_probability: float = wild_card_probability
 
@@ -59,11 +63,14 @@ class CoveringComponent(ICoveringComponent):
     def wildcard_probability(self, value: float):
         """
         :param value: Must be float in range [0.0, 1.0]
+        :raises:
+            WrongStrictTypeException: If wild_card_probability is not a float.
+            OutOfRangeException: If wild_card_probability is not in range [0.0, 1.0].
         """
         if not isinstance(value, float):
-            raise ValueError(f"{value} is not of type float")
+            raise WrongStrictTypeException(float.__name__, type(value).__name__)
         if value < 0.0 or value > 1.0:
-            raise ValueError(f"{value} out of range [0.0, 1.0]")
+            raise OutOfRangeException(0.0, 1.0, value)
 
         self._wildcard_probability = value
 
