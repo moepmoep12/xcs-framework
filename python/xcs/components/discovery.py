@@ -190,7 +190,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
         """
         Generates a child classifier from a parent. Uses deep copy.
         """
-        child = Classifier(copy.deepcopy(parent.condition), copy.deepcopy(parent.action))
+        child = Classifier(copy.deepcopy(parent.condition), copy.deepcopy(parent.action), copy.deepcopy(parent.subsumption_criteria))
         child.fitness = parent.fitness / parent.numerosity
         child.prediction = parent.prediction
         child.epsilon = parent.epsilon

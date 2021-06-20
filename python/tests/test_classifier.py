@@ -18,18 +18,20 @@ class TestClassifier(TestCase):
     def test_init(self):
         from xcs.classifier import Classifier
         from xcs.exceptions import NoneValueException, WrongSubTypeException
+        from tests.stubs import SubsumptionStub
 
         with self.assertRaises(NoneValueException):
-            Classifier(None, 1)
+            Classifier(None, 1, SubsumptionStub())
 
         with self.assertRaises(WrongSubTypeException):
-            Classifier('a', 1)
+            Classifier('a', 1, SubsumptionStub())
 
     def test_deep_copy(self):
-        import copy
         from xcs.classifier import Classifier
+        from tests.stubs import SubsumptionStub
+        import copy
 
-        original = Classifier(self.conditions[0], 1)
+        original = Classifier(self.conditions[0], 1, SubsumptionStub())
         original.fitness = 10
         original.prediction = 22
         clone = copy.deepcopy(original)

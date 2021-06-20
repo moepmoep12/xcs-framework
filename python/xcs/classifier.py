@@ -2,6 +2,7 @@ from typing import TypeVar, Generic
 
 from .condition import Condition
 from .exceptions import NoneValueException, WrongSubTypeException
+from .subsumption import ISubsumptionCriteria
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -14,10 +15,14 @@ class Classifier(Generic[SymbolType, ActionType]):
     A classifier represents a rule of the form 'if CONDITION then ACTION'.
     """
 
-    def __init__(self, condition: Condition[SymbolType], action: ActionType):
+    def __init__(self,
+                 condition: Condition[SymbolType],
+                 action: ActionType,
+                 subsumption_criteria: ISubsumptionCriteria):
         """
         :param condition: The condition under which this classifier is active.
         :param action: The action to execute if this classifier is active.
+        :param subsumption_criteria: Used for determining if this classifier can subsume other classifier.
         :raises:
             NoneValueException: If any of the required arguments is None.
             WrongSubTypeException: If the condition is not of type Condition.
@@ -36,6 +41,7 @@ class Classifier(Generic[SymbolType, ActionType]):
         self._numerosity: int = 1
         self._prediction: float = 0
         self._epsilon: float = 0
+        self.subsumption_criteria = subsumption_criteria
 
     @property
     def condition(self) -> Condition[SymbolType]:
@@ -100,6 +106,42 @@ class Classifier(Generic[SymbolType, ActionType]):
         :return: How often this classifier belonged to the action set.
         """
         return self._experience
+
+    @property
+    def subsumption_criteria(self) -> ISubsumptionCriteria:
+        """
+        :return: The object used for determining if this classifier can subsume other classifier.
+        """
+        return self._subsumption_criteria
+
+    @subsumption_criteria.setter
+    def subsumption_criteria(self, value: ISubsumptionCriteria):
+        """
+        :param value: Object that implements ISubsumptionCriteria.
+        :raises:
+            WrongSubTypeException: If value is not a subtype of ISubsumptionCriteria.
+        """
+        if not isinstance(value, ISubsumptionCriteria):
+            raise WrongSubTypeException(ISubsumptionCriteria.__name__, type(value).__name__)
+
+        self._subsumption_criteria = value
+
+    def can_subsume(self) -> bool:
+        """
+        :return: Whether this classifier can subsume other classifier.
+        """
+        return self.subsumption_criteria.can_subsume(self)
+
+    def subsumes(self, other) -> bool:
+        """
+        Checks whether this classifier can subsume another classifier.
+
+        :param other: Other classifier to check against.
+        :return: Whether this classifier can subsume other.
+        """
+        return self.action == getattr(other, 'action', None) \
+               and self.can_subsume() \
+               and self.condition.is_more_general(getattr(other, 'condition', None))
 
     def __repr__(self):
         return f"{str(self.condition)} : {self.action}, F:{self.fitness}, P:{self.prediction}, E:{self.epsilon}," \

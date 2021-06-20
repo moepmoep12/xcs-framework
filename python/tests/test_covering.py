@@ -5,7 +5,9 @@ class TestCoveringComponent(TestCase):
     def test_set_wildcard_probability(self):
         from xcs.components.covering import CoveringComponent
         from xcs.exceptions import OutOfRangeException
-        covering_component = CoveringComponent(0.0)
+        from tests.stubs import SubsumptionStub
+
+        covering_component = CoveringComponent(0.0, SubsumptionStub())
 
         with self.assertRaises(OutOfRangeException):
             covering_component.wildcard_probability = -1.0
@@ -19,20 +21,22 @@ class TestCoveringComponent(TestCase):
     def test_wildcard_probability_constructor(self):
         from xcs.components.covering import CoveringComponent
         from xcs.exceptions import OutOfRangeException
+        from tests.stubs import SubsumptionStub
 
         with self.assertRaises(OutOfRangeException):
-            CoveringComponent(wild_card_probability=-1.0)
+            CoveringComponent(wild_card_probability=-1.0, subsumption_criteria=SubsumptionStub())
 
         with self.assertRaises(OutOfRangeException):
-            CoveringComponent(wild_card_probability='a')
+            CoveringComponent(wild_card_probability='a', subsumption_criteria=SubsumptionStub())
 
         with self.assertRaises(OutOfRangeException):
-            CoveringComponent(wild_card_probability=1.5)
+            CoveringComponent(wild_card_probability=1.5, subsumption_criteria=SubsumptionStub())
 
     def test_covering_operation_no_wildcard(self):
         from xcs.components.covering import CoveringComponent
         from xcs.state import State
-        covering_component = CoveringComponent(0.0)
+        from tests.stubs import SubsumptionStub
+        covering_component = CoveringComponent(0.0, SubsumptionStub())
         available_actions = [0, 1, 2]
         state = State(['1', '0', '1'])
 
@@ -47,7 +51,8 @@ class TestCoveringComponent(TestCase):
         from xcs.components.covering import CoveringComponent
         from xcs.state import State
         from xcs.symbol import WildcardSymbol
-        covering_component = CoveringComponent(1.0)
+        from tests.stubs import SubsumptionStub
+        covering_component = CoveringComponent(1.0, SubsumptionStub())
         available_actions = [0, 1, 2]
         state = State(['1', '0', '1'])
 
