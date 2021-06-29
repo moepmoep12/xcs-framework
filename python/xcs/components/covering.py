@@ -11,7 +11,6 @@ from xcs.classifier import Classifier
 from xcs.condition import Condition
 from xcs.symbol import WildcardSymbol, Symbol, ISymbol
 from xcs.exceptions import OutOfRangeException, WrongSubTypeException, EmptyCollectionException
-from xcs.subsumption import ISubsumptionCriteria
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -45,14 +44,11 @@ class CoveringComponent(ICoveringComponent):
     Basic CoveringComponent.
     """
 
-    def __init__(self, wild_card_probability: float, subsumption_criteria: ISubsumptionCriteria):
+    def __init__(self, wild_card_probability: float):
         """
         :param wild_card_probability: Must be number in range [0.0, 1.0].
-        :param subsumption_criteria: Used for determining if this classifier can subsume other classifier.
         """
-
         self.wildcard_probability = wild_card_probability
-        self.subsumption_criteria = subsumption_criteria
 
     @property
     def wildcard_probability(self) -> float:
@@ -69,25 +65,6 @@ class CoveringComponent(ICoveringComponent):
             raise OutOfRangeException(0.0, 1.0, value)
 
         self._wildcard_probability = value
-
-    @property
-    def subsumption_criteria(self) -> ISubsumptionCriteria:
-        """
-        :return: The object used for determining if this classifier can subsume other classifier.
-        """
-        return self._subsumption_criteria
-
-    @subsumption_criteria.setter
-    def subsumption_criteria(self, value: ISubsumptionCriteria):
-        """
-        :param value: Object that implements ISubsumptionCriteria.
-        :raises:
-            WrongSubTypeException: If value is not a subtype of ISubsumptionCriteria.
-        """
-        if not isinstance(value, ISubsumptionCriteria):
-            raise WrongSubTypeException(ISubsumptionCriteria.__name__, type(value).__name__)
-
-        self._subsumption_criteria = value
 
     @overrides
     def covering_operation(self,
@@ -120,8 +97,7 @@ class CoveringComponent(ICoveringComponent):
                 else:
                     condition_symbols[i] = Symbol(copy.deepcopy(current_state[i]))
 
-            cl = Classifier(condition=Condition(condition_symbols), action=action,
-                            subsumption_criteria=self.subsumption_criteria)
+            cl = Classifier(condition=Condition(condition_symbols), action=action)
             result.append(cl)
 
         return result

@@ -8,11 +8,11 @@ class TestGeneticAlgorithm(TestCase):
         from xcs.symbol import Symbol, WildcardSymbol
         from xcs.classifier import Classifier
         from xcs.components.discovery import GeneticAlgorithm
-        from tests.stubs import SelectionStub, SubsumptionStub
+        from tests.stubs import SelectionStub
         ga = GeneticAlgorithm(SelectionStub(), [0])
         condition: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         action: int = 1
-        parent: Classifier[str, int] = Classifier(condition, action, SubsumptionStub())
+        parent: Classifier[str, int] = Classifier(condition, action)
         parent.fitness = 100
         parent.prediction = 50
         parent.epsilon = 10

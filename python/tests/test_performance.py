@@ -23,11 +23,11 @@ class TestPerformanceComponent(TestCase):
         from tests.stubs import SubsumptionStub
 
         state: State[str] = State(['1', '0', '1'])
-        cl1: Classifier[str, int] = Classifier(self.conditions[0], 1, SubsumptionStub())
-        cl2: Classifier[str, int] = Classifier(self.conditions[0], 0, SubsumptionStub())
-        cl3: Classifier[str, int] = Classifier(self.conditions[1], 0, SubsumptionStub())
-        population: Population[str, int] = Population(3, [cl1, cl2, cl3])
-        performance_component = PerformanceComponent()
+        cl1: Classifier[str, int] = Classifier(self.conditions[0], 1)
+        cl2: Classifier[str, int] = Classifier(self.conditions[0], 0)
+        cl3: Classifier[str, int] = Classifier(self.conditions[1], 0)
+        population: Population[str, int] = Population(3, SubsumptionStub(), [cl1, cl2, cl3])
+        performance_component = PerformanceComponent(2, None, [0, 1, 2])
         match_set: MatchSet[str, int] = performance_component.generate_match_set(population, state)
 
         self.assertTrue(len(match_set) == 2)

@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, List
 
 from xcs.state import State
 from xcs.classifier_sets import Population
@@ -19,13 +19,14 @@ class XCS(Generic[SymbolType, ActionType]):
                  performance_component: IPerformanceComponent,
                  discovery_component: IDiscoveryComponent,
                  learning_component: ILearningComponent,
-                 covering_component: ICoveringComponent):
+                 available_actions: List[ActionType]):
 
         self.performance_component: IPerformanceComponent = performance_component
         self.discovery_component: IDiscoveryComponent = discovery_component
         self.learning_component: ILearningComponent = learning_component
-        self.covering_component: ICoveringComponent = covering_component
+        # self.covering_component: ICoveringComponent = covering_component
         self._population: Population[SymbolType, ActionType] = None
+        self._available_actions = available_actions
 
     def explore(self, state: State[SymbolType, ActionType]) -> ActionType:
         """
@@ -35,9 +36,6 @@ class XCS(Generic[SymbolType, ActionType]):
         :return: Returns the chosen action.
         """
         match_set = self._performance_component.generate_match_set(self._population, state)
-        if len(match_set) == 0:
-            # TO-DO: passing available actions
-            match_set.extend(self.covering_component.covering_operation(state, []))
 
         action: ActionType = self._performance_component.choose_action(match_set)
 
@@ -76,13 +74,13 @@ class XCS(Generic[SymbolType, ActionType]):
 
         self._learning_component = value
 
-    @property
-    def covering_component(self) -> ICoveringComponent:
-        return self._covering_component
-
-    @covering_component.setter
-    def covering_component(self, value: ICoveringComponent):
-        if not isinstance(value, ICoveringComponent):
-            raise ValueError(f"{value} is not of type {type(ICoveringComponent)}")
-
-        self._covering_component = value
+    # @property
+    # def covering_component(self) -> ICoveringComponent:
+    #     return self._covering_component
+    #
+    # @covering_component.setter
+    # def covering_component(self, value: ICoveringComponent):
+    #     if not isinstance(value, ICoveringComponent):
+    #         raise ValueError(f"{value} is not of type {type(ICoveringComponent)}")
+    #
+    #     self._covering_component = value

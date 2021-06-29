@@ -20,13 +20,12 @@ class TestClassifierSet(TestCase):
         from xcs.classifier import Classifier
         from xcs.condition import Condition
         from xcs.symbol import Symbol, WildcardSymbol
-        from tests.stubs import SubsumptionStub
 
         cond1: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         cond2: Condition[str] = Condition([Symbol('0'), WildcardSymbol(), Symbol('1')])
-        cl1: Classifier[str, int] = Classifier(condition=cond1, action=1, subsumption_criteria=SubsumptionStub())
-        cl2: Classifier[str, int] = Classifier(condition=cond1, action=0, subsumption_criteria=SubsumptionStub())
-        cl3: Classifier[str, int] = Classifier(condition=cond2, action=0, subsumption_criteria=SubsumptionStub())
+        cl1: Classifier[str, int] = Classifier(condition=cond1, action=1)
+        cl2: Classifier[str, int] = Classifier(condition=cond1, action=0)
+        cl3: Classifier[str, int] = Classifier(condition=cond2, action=0)
         cl_set: ClassifierSet[Classifier[str, int]] = ClassifierSet([cl1, cl2])
         cl_set2: ClassifierSet[Classifier[str, int]] = ClassifierSet([cl1, cl2])
         cl_set3: ClassifierSet[Classifier[str, int]] = ClassifierSet(cl_set)
@@ -46,17 +45,14 @@ class TestClassifierSet(TestCase):
         from xcs.classifier import Classifier
         from tests.stubs import SubsumptionStub
 
-        cl1: Classifier[str, int] = Classifier(condition=self.conditions[0], action=1,
-                                               subsumption_criteria=SubsumptionStub())
-        cl2: Classifier[str, int] = Classifier(condition=self.conditions[0], action=0,
-                                               subsumption_criteria=SubsumptionStub())
-        cl3: Classifier[str, int] = Classifier(condition=self.conditions[1], action=0,
-                                               subsumption_criteria=SubsumptionStub())
+        cl1: Classifier[str, int] = Classifier(condition=self.conditions[0], action=1)
+        cl2: Classifier[str, int] = Classifier(condition=self.conditions[0], action=0)
+        cl3: Classifier[str, int] = Classifier(condition=self.conditions[1], action=0)
 
         with self.assertRaises(AssertionError):
-            Population(2, [cl1, cl2, cl3])
+            Population(2, SubsumptionStub(), [cl1, cl2, cl3])
 
-        population: Population[str, int] = Population(3, [cl1, cl2, cl3])
+        population: Population[str, int] = Population(3, SubsumptionStub(), [cl1, cl2, cl3])
 
         self.assertTrue(len(population) == 3)
         self.assertTrue(population[0] == cl1)

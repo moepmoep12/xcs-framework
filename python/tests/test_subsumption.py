@@ -47,10 +47,10 @@ class TestSubsumptionCriteriaExperiencePrecision(TestCase):
         sub_criteria = SubsumptionCriteriaExperiencePrecision(min_exp=min_exp, max_epsilon=max_epsilon)
         condition1 = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         condition2 = Condition([Symbol('1'), WildcardSymbol(), WildcardSymbol()])
-        cl1 = Classifier(condition1, 1, sub_criteria)
+        cl1 = Classifier(condition1, 1)
         cl1._experience = min_exp
         cl1._epsilon = max_epsilon
-        cl2 = Classifier(condition2, 1, sub_criteria)
+        cl2 = Classifier(condition2, 1)
 
         self.assertTrue(sub_criteria.can_subsume(cl1))
         self.assertFalse(sub_criteria.can_subsume(cl2))
