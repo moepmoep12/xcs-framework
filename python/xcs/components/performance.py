@@ -15,7 +15,6 @@ ActionType = TypeVar('ActionType')
 
 class IPerformanceComponent(ABC):
 
-    # TO-DO: Does is it have to be a population? maybe generic ClassifierSet instead?
     @abstractmethod
     def generate_match_set(self, population: Population[SymbolType, ActionType], state: State[SymbolType]) -> \
             MatchSet[SymbolType, ActionType]:
@@ -60,6 +59,7 @@ class PerformanceComponent(IPerformanceComponent):
 
         actions = match_set.get_available_actions()
 
+        # use covering to create new classifier
         if len(actions) < self._min_diff_actions and self._min_diff_actions > 0:
             remaining_actions = set([a for a in self._available_actions if a not in actions])
             shuffle(remaining_actions)

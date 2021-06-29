@@ -101,6 +101,9 @@ class Classifier(Generic[SymbolType, ActionType]):
         """
         return self._experience
 
+    def increment_experience(self):
+        self._experience += 1
+
     def subsumes(self, other) -> bool:
         # TO-DO: Exceptions?
         """
