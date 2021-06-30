@@ -55,7 +55,7 @@ class PerformanceComponent(IPerformanceComponent):
         match_set: MatchSet[SymbolType, ActionType] = MatchSet()
         for cl in population:
             if cl.condition.matches(state):
-                match_set.append(cl)
+                match_set.insert_classifier(cl)
 
         actions = match_set.get_available_actions()
 
@@ -70,8 +70,8 @@ class PerformanceComponent(IPerformanceComponent):
 
                 covered_cl = self.covering_component.covering_operation(state, [action])
                 for cl in covered_cl:
-                    match_set.append(cl)
-                    population.append(cl)
+                    match_set.insert_classifier(cl)
+                    population.insert_classifier(cl)
 
         return match_set
 
@@ -79,6 +79,9 @@ class PerformanceComponent(IPerformanceComponent):
     def choose_action(self, match_set: MatchSet[SymbolType, ActionType]) -> ActionType:
         pass
 
+    # ------------------------------------------------------------------------------------------------------------- #
+    # ------------------------------------------------- PROPERTIES ------------------------------------------------ #
+    # ------------------------------------------------------------------------------------------------------------- #
     @property
     def covering_component(self) -> ICoveringComponent:
         return self._covering_component

@@ -20,8 +20,9 @@ class ILearningComponent(ABC):
         pass
 
 
-class BasicLearningComponent(ILearningComponent):
+class QLearningBasedComponent(ILearningComponent):
 
+    # to-do: 'settings/param'-object as argument?
     def __init__(self, learning_rate_prediction: float):
         """
         :param learning_rate_prediction: The learning rate >0 for updating the prediction of a classifier.
@@ -48,6 +49,10 @@ class BasicLearningComponent(ILearningComponent):
         # to-do: subsumption
 
     def _update_fitness(self, classifier_set: ClassifierSet[SymbolType, ActionType]):
+        """
+        updates the fitness of each classifier.
+        :param classifier_set: The set of classifier which will be updated.
+        """
         accuracy_sum: float = 0
         accuracy_dict = dict()
         for cl in classifier_set:
@@ -63,23 +68,21 @@ class BasicLearningComponent(ILearningComponent):
         return 1.0 if classifier.epsilon <= self._epsilon_zero else self._learning_rate_fitness * (
                 (classifier.epsilon / self._epsilon_zero) ** -self._accuracy_power)
 
+    @property
+    def learning_rate_prediction(self) -> float:
+        """
+        :return: The learning rate in range ]0.0, inf] for updating the prediction of a classifier.
+        """
+        return self._learning_rate_prediction
 
-@property
-def learning_rate_prediction(self) -> float:
-    """
-    :return: The learning rate in range ]0.0, inf] for updating the prediction of a classifier.
-    """
-    return self._learning_rate_prediction
+    @learning_rate_prediction.setter
+    def learning_rate_prediction(self, value: float):
+        """
+        :param value: Float in range ]0.0, inf].
+        : raises:
+            OutOfRangeException: If value is not a float in range ]0.0, inf].
+        """
+        if not isinstance(value, Number) or value <= 0.0:
+            raise OutOfRangeException(0.0, inf, value)
 
-
-@learning_rate_prediction.setter
-def learning_rate_prediction(self, value: float):
-    """
-    :param value: Float in range ]0.0, inf].
-    : raises:
-        OutOfRangeException: If value is not a float in range ]0.0, inf].
-    """
-    if not isinstance(value, Number) or value <= 0.0:
-        raise OutOfRangeException(0.0, inf, value)
-
-    self._learning_rate_prediction = value
+        self._learning_rate_prediction = value

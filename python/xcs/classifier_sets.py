@@ -1,4 +1,5 @@
-from typing import Set, List, Iterable, TypeVar
+from abc import ABCMeta
+from typing import Set, TypeVar, Generic, Iterator
 
 from .classifier import Classifier
 from .subsumption import ISubsumptionCriteria
@@ -10,10 +11,34 @@ SymbolType = TypeVar('SymbolType')
 ActionType = TypeVar('ActionType')
 
 
-class ClassifierSet(List[Classifier[SymbolType, ActionType]]):
+class ClassifierSet(Generic[SymbolType, ActionType]):
     """
     A ClassifierSet represents a generic collection of classifiers.
     """
+
+    def __init__(self, *args):
+        self._classifier = list(*args)
+
+    def __len__(self) -> int:
+        return len(self._classifier)
+
+    def __iter__(self) -> Iterator[Classifier[SymbolType, ActionType]]:
+        return self._classifier.__iter__()
+
+    def __contains__(self, __x: object) -> bool:
+        return self._classifier.__contains__(__x)
+
+    def __getitem__(self, item):
+        return self._classifier.__getitem__(item)
+
+    def __eq__(self, other):
+        return self._classifier.__eq__(getattr(other, '_classifier', None))
+
+    def insert_classifier(self, __object: Classifier[SymbolType, ActionType], **kwargs) -> None:
+        if not isinstance(__object, Classifier):
+            raise WrongSubTypeException(Classifier.__name__, type(__object).__name__)
+
+        self._classifier.append(__object)
 
     def get_available_actions(self) -> Set[ActionType]:
         """
@@ -39,6 +64,41 @@ class Population(ClassifierSet[SymbolType, ActionType]):
         self._max_size = max_size
         self.subsumption_criteria = subsumption_criteria
 
+    def __len__(self) -> int:
+        return sum([cl.numerosity for cl in self])
+
+    def insert_classifier(self, __object: Classifier[SymbolType, ActionType], **kwargs) -> None:
+        if not isinstance(__object, Classifier):
+            raise WrongSubTypeException(Classifier.__name__, type(__object).__name__)
+
+        do_subsumption = kwargs.get('subsumption', False)
+
+        # population too big -> deletion necessary
+        if len(self) + __object.numerosity > self._max_size:
+            self._trim_population(desired_size=self._max_size - __object.numerosity)
+
+        # check for same classifier
+        for cl in self:
+            if cl.condition == __object.condition and cl.action == __object.action:
+                cl.numerosity += __object.numerosity
+                return
+
+        # classifier isn't present, check for subsumption
+        if do_subsumption:
+            for cl in self:
+                if cl.subsumes(__object) and self._subsumption_criteria.can_subsume(cl):
+                    cl.numerosity += __object.numerosity
+                    return
+
+        # classifier is new, add it
+        self._classifier.append(__object)
+
+    def _trim_population(self, desired_size: int) -> None:
+        pass
+
+    # ------------------------------------------------------------------------------------------------------------- #
+    # ------------------------------------------------- PROPERTIES ------------------------------------------------ #
+    # ------------------------------------------------------------------------------------------------------------- #
     @property
     def subsumption_criteria(self) -> ISubsumptionCriteria:
         """
@@ -57,23 +117,6 @@ class Population(ClassifierSet[SymbolType, ActionType]):
             raise WrongSubTypeException(ISubsumptionCriteria.__name__, type(value).__name__)
 
         self._subsumption_criteria = value
-
-    def append(self, __object: Classifier[SymbolType, ActionType]) -> None:
-
-        if len(self) < self._max_size:
-            super().append(__object)
-        else:
-            # To-Do: Trigger subsumption or deletion?
-            pass
-
-    def extend(self, __iterable: Iterable[Classifier[SymbolType, ActionType]]) -> None:
-        super().extend(__iterable)
-
-    def pop(self, __index: int = ...) -> Classifier[SymbolType, ActionType]:
-        return super().pop(__index)
-
-    def remove(self, __value: Classifier[SymbolType, ActionType]) -> None:
-        super().remove(__value)
 
 
 class MatchSet(ClassifierSet[SymbolType, ActionType]):

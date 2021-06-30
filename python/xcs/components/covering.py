@@ -10,7 +10,7 @@ from xcs.state import State
 from xcs.classifier import Classifier
 from xcs.condition import Condition
 from xcs.symbol import WildcardSymbol, Symbol, ISymbol
-from xcs.exceptions import OutOfRangeException, WrongSubTypeException, EmptyCollectionException
+from xcs.exceptions import OutOfRangeException, EmptyCollectionException
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -50,22 +50,6 @@ class CoveringComponent(ICoveringComponent):
         """
         self.wildcard_probability = wild_card_probability
 
-    @property
-    def wildcard_probability(self) -> float:
-        return self._wildcard_probability
-
-    @wildcard_probability.setter
-    def wildcard_probability(self, value: float):
-        """
-        :param value: Must be number in range [0.0, 1.0].
-        :raises:
-            OutOfRangeException: If wild_card_probability is not a number in range [0.0, 1.0].
-        """
-        if not isinstance(value, Number) or value < 0.0 or value > 1.0:
-            raise OutOfRangeException(0.0, 1.0, value)
-
-        self._wildcard_probability = value
-
     @overrides
     def covering_operation(self,
                            current_state: State[SymbolType],
@@ -98,6 +82,25 @@ class CoveringComponent(ICoveringComponent):
                     condition_symbols[i] = Symbol(copy.deepcopy(current_state[i]))
 
             cl = Classifier(condition=Condition(condition_symbols), action=action)
-            result.append(cl)
+            result.insert_classifier(cl)
 
         return result
+
+    # ------------------------------------------------------------------------------------------------------------- #
+    # ------------------------------------------------- PROPERTIES ------------------------------------------------ #
+    # ------------------------------------------------------------------------------------------------------------- #
+    @property
+    def wildcard_probability(self) -> float:
+        return self._wildcard_probability
+
+    @wildcard_probability.setter
+    def wildcard_probability(self, value: float):
+        """
+        :param value: Must be number in range [0.0, 1.0].
+        :raises:
+            OutOfRangeException: If wild_card_probability is not a number in range [0.0, 1.0].
+        """
+        if not isinstance(value, Number) or value < 0.0 or value > 1.0:
+            raise OutOfRangeException(0.0, 1.0, value)
+
+        self._wildcard_probability = value
