@@ -35,6 +35,13 @@ class ClassifierSet(Generic[SymbolType, ActionType]):
         return self._classifier.__eq__(getattr(other, '_classifier', None))
 
     def insert_classifier(self, __object: Classifier[SymbolType, ActionType], **kwargs) -> None:
+        """
+        Inserts a classifier into this set.
+        :param __object: The classifier to be inserted.
+        :param kwargs: Key worded arguments.
+        :raises:
+            WrongSubTypeException: If __object is not a subtype of Classifier.
+        """
         if not isinstance(__object, Classifier):
             raise WrongSubTypeException(Classifier.__name__, type(__object).__name__)
 
@@ -46,16 +53,22 @@ class ClassifierSet(Generic[SymbolType, ActionType]):
         """
         return set([cl.action for cl in self])
 
+    def numerosity_sum(self) -> int:
+        return sum(cl.numerosity for cl in self)
+
 
 class Population(ClassifierSet[SymbolType, ActionType]):
     """
     A population is a set of classifier that represent the knowledge base of a LCS.
     """
 
-    def __init__(self, max_size: int, subsumption_criteria: ISubsumptionCriteria, *args):
+    def __init__(self, max_size: int,
+                 subsumption_criteria: ISubsumptionCriteria,
+                 *args):
         """
         :param max_size: The maximum size of the population.
         :param subsumption_criteria: Used for determining if a classifier can subsume other classifier.
+        :param deletion_selection: The strategy used for selection classifier to delete from population.
         :raises:
             AssertionError: If the initial collection is greater than the maximum size.
         """
@@ -63,9 +76,7 @@ class Population(ClassifierSet[SymbolType, ActionType]):
         super(Population, self).__init__(*args)
         self._max_size = max_size
         self.subsumption_criteria = subsumption_criteria
-
-    def __len__(self) -> int:
-        return sum([cl.numerosity for cl in self])
+        # self.deletion_selection = deletion_selection
 
     def insert_classifier(self, __object: Classifier[SymbolType, ActionType], **kwargs) -> None:
         if not isinstance(__object, Classifier):
@@ -74,7 +85,7 @@ class Population(ClassifierSet[SymbolType, ActionType]):
         do_subsumption = kwargs.get('subsumption', False)
 
         # population too big -> deletion necessary
-        if len(self) + __object.numerosity > self._max_size:
+        if self.numerosity_sum() + __object.numerosity > self._max_size:
             self._trim_population(desired_size=self._max_size - __object.numerosity)
 
         # check for same classifier
@@ -94,7 +105,8 @@ class Population(ClassifierSet[SymbolType, ActionType]):
         self._classifier.append(__object)
 
     def _trim_population(self, desired_size: int) -> None:
-        pass
+        if len(self) <= self._max_size:
+            return
 
     # ------------------------------------------------------------------------------------------------------------- #
     # ------------------------------------------------- PROPERTIES ------------------------------------------------ #
@@ -117,6 +129,25 @@ class Population(ClassifierSet[SymbolType, ActionType]):
             raise WrongSubTypeException(ISubsumptionCriteria.__name__, type(value).__name__)
 
         self._subsumption_criteria = value
+
+    # @property
+    # def deletion_selection(self) -> IClassifierSelectionStrategy:
+    #     """
+    #     :return: The strategy used for selection classifier to delete from population.
+    #     """
+    #     return self._deletion_selection
+    #
+    # @deletion_selection.setter
+    # def deletion_selection(self, value: IClassifierSelectionStrategy):
+    #     """
+    #     :param value: Object that implements IClassifierSelectionStrategy.
+    #     :raises:
+    #         WrongSubTypeException: If value is not a subtype of IClassifierSelectionStrategy.
+    #     """
+    #     if not isinstance(value, ISubsumptionCriteria):
+    #         raise WrongSubTypeException(IClassifierSelectionStrategy.__name__, type(value).__name__)
+    #
+    #     self._deletion_selection = value
 
 
 class MatchSet(ClassifierSet[SymbolType, ActionType]):
