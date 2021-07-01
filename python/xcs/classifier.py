@@ -1,7 +1,9 @@
 from typing import TypeVar, Generic
+from numbers import Number
+from math import inf
 
 from .condition import Condition
-from .exceptions import NoneValueException, WrongSubTypeException
+from .exceptions import NoneValueException, WrongSubTypeException, OutOfRangeException
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -36,6 +38,7 @@ class Classifier(Generic[SymbolType, ActionType]):
         self._numerosity: int = 1
         self._prediction: float = 0
         self._epsilon: float = 0
+        self._action_set_size: float = 1
 
     @property
     def condition(self) -> Condition[SymbolType]:
@@ -77,13 +80,14 @@ class Classifier(Generic[SymbolType, ActionType]):
     @property
     def epsilon(self) -> float:
         """
-        :return: The error epsilon of the prediction.
+        :return: The error epsilon of the prediction in range [0, inf].
         """
         return self._epsilon
 
-    # To-Do: Restrict to range?
     @epsilon.setter
     def epsilon(self, value: float):
+        if not isinstance(value, Number) or value < 0:
+            raise OutOfRangeException(0.0, inf, value)
         self._epsilon = value
 
     @property
@@ -93,6 +97,20 @@ class Classifier(Generic[SymbolType, ActionType]):
         Increases by the process of subsumption.
         """
         return self._numerosity
+
+    @property
+    def action_set_size(self) -> float:
+        """
+        :return: The average size of the action set this classifier belonged to.
+        """
+        return self._action_set_size
+
+    @action_set_size.setter
+    def action_set_size(self, value: float):
+        if not isinstance(value, Number) or value < 1:
+            raise OutOfRangeException(1, inf, value)
+
+        self._action_set_size = value
 
     @property
     def experience(self) -> int:

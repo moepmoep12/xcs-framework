@@ -40,9 +40,12 @@ class QLearningBasedComponent(ILearningComponent):
             if cl.experience < (1 / self.learning_rate_prediction):
                 cl.prediction += (reward - cl.prediction) / cl.experience
                 cl.epsilon += (abs(reward - cl.prediction) - cl.epsilon) / cl.experience
+                cl.action_set_size += (classifier_set.numerosity_sum() - cl.action_set_size) / cl.experience
             else:
                 cl.prediction += self.learning_rate_prediction * (reward - cl.prediction)
                 cl.epsilon += self.learning_rate_prediction * (abs(reward - cl.prediction) - cl.epsilon)
+                cl.action_set_size += self.learning_rate_prediction * (
+                            classifier_set.numerosity_sum() - cl.action_set_size)
 
         self._update_fitness(classifier_set)
 
