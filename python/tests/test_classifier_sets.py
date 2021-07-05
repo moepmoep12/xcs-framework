@@ -2,19 +2,6 @@ from unittest import TestCase
 
 
 class TestClassifierSet(TestCase):
-    from xcs.condition import Condition
-    from typing import List
-
-    conditions: List[Condition[str]] = []
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        from xcs.condition import Condition
-        from xcs.symbol import Symbol, WildcardSymbol
-        cls.conditions.append(Condition([Symbol('1'), WildcardSymbol(), Symbol('1')]))
-        cls.conditions.append(Condition([Symbol('0'), WildcardSymbol(), Symbol('1')]))
-        cls.conditions.append(Condition([Symbol('0'), Symbol('1'), Symbol('1')]))
-
     def test_classifier_set(self):
         from xcs.classifier_sets import ClassifierSet
         from xcs.classifier import Classifier
@@ -40,21 +27,55 @@ class TestClassifierSet(TestCase):
         self.assertTrue(cl_set3[2] == cl3)
         self.assertTrue(available_actions == set([1, 0]))
 
+
+class TestPopulation(TestCase):
+
     def test_create_population(self):
         from xcs.classifier_sets import Population
         from xcs.classifier import Classifier
+        from xcs.condition import Condition
+        from xcs.symbol import WildcardSymbol, Symbol
         from tests.stubs import SubsumptionStub
 
-        cl1: Classifier[str, int] = Classifier(condition=self.conditions[0], action=1)
-        cl2: Classifier[str, int] = Classifier(condition=self.conditions[0], action=0)
-        cl3: Classifier[str, int] = Classifier(condition=self.conditions[1], action=0)
+        cond1 = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
+        cond2 = Condition([Symbol('0'), WildcardSymbol(), Symbol('1')])
+
+        cl1: Classifier[str, int] = Classifier(condition=cond1, action=1)
+        cl2: Classifier[str, int] = Classifier(condition=cond1, action=0)
+        cl3: Classifier[str, int] = Classifier(condition=cond2, action=0)
 
         with self.assertRaises(AssertionError):
-            Population(2, SubsumptionStub(), [cl1, cl2, cl3])
+            Population(max_size=2, subsumption_criteria=SubsumptionStub(), classifier=[cl1, cl2, cl3])
 
-        population: Population[str, int] = Population(3, SubsumptionStub(), [cl1, cl2, cl3])
+        population: Population[str, int] = Population(max_size=3, subsumption_criteria=SubsumptionStub(),
+                                                      classifier=[cl1, cl2, cl3])
 
         self.assertTrue(len(population) == 3)
         self.assertTrue(population[0] == cl1)
         self.assertTrue(population[1] == cl2)
         self.assertTrue(population[2] == cl3)
+
+    def test_trim_population(self):
+        from xcs.classifier_sets import Population
+        from xcs.classifier import Classifier
+        from xcs.condition import Condition
+        from xcs.symbol import WildcardSymbol, Symbol
+        from tests.stubs import SubsumptionStub
+
+        cond1 = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
+        cond2 = Condition([Symbol('0'), WildcardSymbol(), Symbol('1')])
+
+        cl1: Classifier[str, int] = Classifier(condition=cond1, action=1)
+        cl1._numerosity = 3
+        cl2: Classifier[str, int] = Classifier(condition=cond1, action=0)
+        cl3: Classifier[str, int] = Classifier(condition=cond2, action=0)
+
+        population: Population[str, int] = Population(max_size=3, subsumption_criteria=SubsumptionStub(),
+                                                      classifier=[cl1, cl2, cl3])
+
+        population.trim_population(desired_size=population.max_size)
+        self.assertEqual(population.numerosity_sum(), population.max_size)
+
+        population.trim_population(desired_size=1)
+        self.assertEqual(len(population), 1)
+        self.assertEqual(population.numerosity_sum(), 1)

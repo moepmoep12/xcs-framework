@@ -1,9 +1,11 @@
-from abc import ABCMeta
 from typing import Set, TypeVar, Generic, Iterator
+from numbers import Number
+from math import inf
 
 from .classifier import Classifier
 from .subsumption import ISubsumptionCriteria
-from .exceptions import WrongSubTypeException
+from .exceptions import WrongSubTypeException, OutOfRangeException
+from .selection import IClassifierSelectionStrategy, RouletteWheelSelection
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -64,7 +66,8 @@ class Population(ClassifierSet[SymbolType, ActionType]):
 
     def __init__(self, max_size: int,
                  subsumption_criteria: ISubsumptionCriteria,
-                 *args):
+                 deletion_selection: IClassifierSelectionStrategy = RouletteWheelSelection(),
+                 classifier=[]):
         """
         :param max_size: The maximum size of the population.
         :param subsumption_criteria: Used for determining if a classifier can subsume other classifier.
@@ -72,11 +75,11 @@ class Population(ClassifierSet[SymbolType, ActionType]):
         :raises:
             AssertionError: If the initial collection is greater than the maximum size.
         """
-        assert (len(*args) <= max_size)
-        super(Population, self).__init__(*args)
+        assert (len(classifier) <= max_size)
+        super(Population, self).__init__(classifier)
+        self.deletion_selection = deletion_selection
         self._max_size = max_size
         self.subsumption_criteria = subsumption_criteria
-        # self.deletion_selection = deletion_selection
 
     def insert_classifier(self, __object: Classifier[SymbolType, ActionType], **kwargs) -> None:
         if not isinstance(__object, Classifier):
@@ -104,13 +107,49 @@ class Population(ClassifierSet[SymbolType, ActionType]):
         # classifier is new, add it
         self._classifier.append(__object)
 
-    def _trim_population(self, desired_size: int) -> None:
-        if len(self) <= self._max_size:
-            return
+        # trim population to max size
+        self.trim_population(self._max_size)
 
-    # ------------------------------------------------------------------------------------------------------------- #
-    # ------------------------------------------------- PROPERTIES ------------------------------------------------ #
-    # ------------------------------------------------------------------------------------------------------------- #
+    def trim_population(self, desired_size: int) -> None:
+
+        while numerosity_sum := self.numerosity_sum() > desired_size:
+            average_fitness = sum([cl.fitness for cl in self]) / numerosity_sum
+
+            def deletion_vote(cl: Classifier[SymbolType, ActionType]) -> float:
+                vote = cl.action_set_size * cl.numerosity
+                # to-do: implement check
+                if average_fitness > 0 and cl.fitness > 0:
+                    vote *= average_fitness / (cl.fitness / cl.numerosity)
+                return vote
+
+            index = self.deletion_selection.select_classifier(self._classifier, deletion_vote)
+
+            classifier = self[index]
+
+            if classifier.numerosity > 1:
+                classifier.numerosity -= 1
+            else:
+                del self._classifier[index]
+
+    @property
+    def max_size(self) -> int:
+        """
+        :return: The maximum size of this population. The size is measured in total numerosity.
+        """
+        return self._max_size
+
+    @max_size.setter
+    def max_size(self, value: int):
+        """
+        If value < current max_size then deletion will occur.
+        :param value: The maximum size of the population in range [1, inf].
+        """
+        if not isinstance(value, Number) or value < 1:
+            raise OutOfRangeException(1, inf, value)
+
+        self._max_size = value
+        self.trim_population(value)
+
     @property
     def subsumption_criteria(self) -> ISubsumptionCriteria:
         """
@@ -130,24 +169,24 @@ class Population(ClassifierSet[SymbolType, ActionType]):
 
         self._subsumption_criteria = value
 
-    # @property
-    # def deletion_selection(self) -> IClassifierSelectionStrategy:
-    #     """
-    #     :return: The strategy used for selection classifier to delete from population.
-    #     """
-    #     return self._deletion_selection
-    #
-    # @deletion_selection.setter
-    # def deletion_selection(self, value: IClassifierSelectionStrategy):
-    #     """
-    #     :param value: Object that implements IClassifierSelectionStrategy.
-    #     :raises:
-    #         WrongSubTypeException: If value is not a subtype of IClassifierSelectionStrategy.
-    #     """
-    #     if not isinstance(value, ISubsumptionCriteria):
-    #         raise WrongSubTypeException(IClassifierSelectionStrategy.__name__, type(value).__name__)
-    #
-    #     self._deletion_selection = value
+    @property
+    def deletion_selection(self) -> IClassifierSelectionStrategy:
+        """
+        :return: The strategy used for selection classifier to delete from population.
+        """
+        return self._deletion_selection
+
+    @deletion_selection.setter
+    def deletion_selection(self, value: IClassifierSelectionStrategy):
+        """
+        :param value: Object that implements IClassifierSelectionStrategy.
+        :raises:
+            WrongSubTypeException: If value is not a subtype of IClassifierSelectionStrategy.
+        """
+        if not isinstance(value, IClassifierSelectionStrategy):
+            raise WrongSubTypeException(IClassifierSelectionStrategy.__name__, type(value).__name__)
+
+        self._deletion_selection = value
 
 
 class MatchSet(ClassifierSet[SymbolType, ActionType]):

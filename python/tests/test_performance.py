@@ -26,7 +26,8 @@ class TestPerformanceComponent(TestCase):
         cl1: Classifier[str, int] = Classifier(self.conditions[0], 1)
         cl2: Classifier[str, int] = Classifier(self.conditions[0], 0)
         cl3: Classifier[str, int] = Classifier(self.conditions[1], 0)
-        population: Population[str, int] = Population(3, SubsumptionStub(), [cl1, cl2, cl3])
+        population: Population[str, int] = Population(max_size=3, subsumption_criteria=SubsumptionStub(),
+                                                      classifier=[cl1, cl2, cl3])
         performance_component = PerformanceComponent(2, None, [0, 1, 2])
         match_set: MatchSet[str, int] = performance_component.generate_match_set(population, state)
 
