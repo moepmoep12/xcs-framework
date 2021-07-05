@@ -79,9 +79,6 @@ class PerformanceComponent(IPerformanceComponent):
     def choose_action(self, match_set: MatchSet[SymbolType, ActionType]) -> ActionType:
         pass
 
-    # ------------------------------------------------------------------------------------------------------------- #
-    # ------------------------------------------------- PROPERTIES ------------------------------------------------ #
-    # ------------------------------------------------------------------------------------------------------------- #
     @property
     def covering_component(self) -> ICoveringComponent:
         return self._covering_component

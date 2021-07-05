@@ -42,7 +42,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
     New classifier are created through crossover and mutation.
     """
 
-    # TO-DO: Add constructor arguments
+    # TO-DO: settings/params class?
     def __init__(self,
                  selection_strategy: IClassifierSelectionStrategy,
                  available_actions: Collection[ActionType],

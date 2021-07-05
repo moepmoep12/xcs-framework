@@ -1,10 +1,9 @@
 from abc import abstractmethod, ABC
-from typing import List, TypeVar, Callable
+from typing import Collection, TypeVar, Callable
 from overrides import overrides
 import random
 from sys import maxsize as max_int
 
-from xcs.classifier_sets import ClassifierSet
 from xcs.classifier import Classifier
 from xcs.exceptions import OutOfRangeException, WrongStrictTypeException
 
@@ -24,7 +23,7 @@ class IClassifierSelectionStrategy(ABC):
 
     @abstractmethod
     def select_classifier(self,
-                          classifier_set: ClassifierSet[SymbolType, ActionType],
+                          classifier_set: Collection[Classifier[SymbolType, ActionType]],
                           score_function: score_function_type) -> int:
         """
         Chooses a single classifier from the given set.
@@ -55,7 +54,7 @@ class TournamentSelection(IClassifierSelectionStrategy):
 
     @overrides
     def select_classifier(self,
-                          classifier_set: ClassifierSet[SymbolType, ActionType],
+                          classifier_set: Collection[Classifier[SymbolType, ActionType]],
                           score_function: score_function_type) -> int:
 
         best: Classifier[SymbolType, ActionType] = None
@@ -77,7 +76,7 @@ class RouletteWheelSelection(IClassifierSelectionStrategy):
 
     @overrides
     def select_classifier(self,
-                          classifier_set: ClassifierSet[SymbolType, ActionType],
+                          classifier_set: Collection[Classifier[SymbolType, ActionType]],
                           score_function: score_function_type) -> int:
 
         score_sum = sum([score_function(cl) for cl in classifier_set])

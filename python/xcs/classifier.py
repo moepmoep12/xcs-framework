@@ -98,6 +98,17 @@ class Classifier(Generic[SymbolType, ActionType]):
         """
         return self._numerosity
 
+    @numerosity.setter
+    def numerosity(self, value: int):
+        """
+        :param value: How many classifier this classifier represents.
+        :raises:
+            OutOfRangeException: If value is not in range [1, inf].
+        """
+        if not isinstance(value, Number) or value < 1:
+            raise OutOfRangeException(1, inf, value)
+        self._numerosity = value
+
     @property
     def action_set_size(self) -> float:
         """
@@ -107,6 +118,11 @@ class Classifier(Generic[SymbolType, ActionType]):
 
     @action_set_size.setter
     def action_set_size(self, value: float):
+        """
+        :param value: The average size of the action set this classifier belonged to.
+        :raises:
+            OutOfRangeException: If value is not in range [1, inf].
+        """
         if not isinstance(value, Number) or value < 1:
             raise OutOfRangeException(1, inf, value)
 
