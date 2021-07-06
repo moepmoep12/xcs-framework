@@ -1,6 +1,7 @@
 from typing import TypeVar, Generic
 from numbers import Number
 from math import inf
+from sys import float_info
 
 from .condition import Condition
 from .exceptions import NoneValueException, WrongSubTypeException, OutOfRangeException
@@ -16,6 +17,7 @@ class Classifier(Generic[SymbolType, ActionType]):
     A classifier represents a rule of the form 'if CONDITION then ACTION'.
     """
 
+    # to-do: use dataclass for initial values?
     def __init__(self, condition: Condition[SymbolType], action: ActionType):
         """
         :param condition: The condition under which this classifier is active.
@@ -34,11 +36,12 @@ class Classifier(Generic[SymbolType, ActionType]):
         self._condition: Condition[SymbolType] = condition
         self._action: ActionType = action
         self._experience: int = 0
-        self._fitness: float = 0
+        self._fitness: float = float_info.epsilon
         self._numerosity: int = 1
-        self._prediction: float = 0
-        self._epsilon: float = 0
+        self._prediction: float = float_info.epsilon
+        self._epsilon: float = float_info.epsilon
         self._action_set_size: float = 1
+        self._age: int = 0
 
     @property
     def condition(self) -> Condition[SymbolType]:
@@ -53,6 +56,25 @@ class Classifier(Generic[SymbolType, ActionType]):
         :return: The suggested action (or classification) to take if the condition is met.
         """
         return self._action
+
+    @property
+    def age(self) -> int:
+        """
+        :return: The age of this classifier.
+        """
+        return self._age
+
+    @age.setter
+    def age(self, value: int):
+        """
+        :param value: The age of this classifier.
+        :raises:
+            OutOfRangeException: If value is not in range [0, inf].
+        """
+        if not isinstance(value, Number) or value < 0:
+            raise OutOfRangeException(1, inf, value)
+
+        self._age = value
 
     @property
     def fitness(self) -> float:
@@ -150,5 +172,5 @@ class Classifier(Generic[SymbolType, ActionType]):
                and self.condition.is_more_general(getattr(other, 'condition', None))
 
     def __repr__(self):
-        return f"{str(self.condition)} : {self.action}, F:{self.fitness}, P:{self.prediction}, E:{self.epsilon}," \
-               f" N:{self.numerosity}, exp:{self.experience} "
+        return f"{str(self.condition)} : {self.action}, F:{self.fitness:.3f}, P:{self.prediction:.3f}, E:{self.epsilon:.3f}," \
+               f" N:{self.numerosity}, exp:{self.experience}, AS:{self.action_set_size:.3f}, AGE:{self.age} "
