@@ -228,7 +228,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
 
         if random.random() < self.crossover_probability:
             # TO-DO: Perform crossover according to strategy
-            pass
+            performed_crossover = self._two_point_crossover(cl1, cl2)
 
         if performed_crossover:
             cl1.prediction = cl2.prediction = (cl1.prediction + cl2.prediction) / 2
