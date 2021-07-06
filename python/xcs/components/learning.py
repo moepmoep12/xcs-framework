@@ -1,10 +1,9 @@
 from abc import abstractmethod, ABC
 from overrides import overrides
-from typing import TypeVar, List, Collection, Set
+from typing import TypeVar
 from math import inf
 from numbers import Number
 
-from xcs.classifier import Classifier
 from xcs.classifier_sets import ClassifierSet
 from xcs.exceptions import OutOfRangeException
 
@@ -64,8 +63,8 @@ class QLearningBasedComponent(ILearningComponent):
             accuracy_sum += accuracy * cl.numerosity
 
         for cl in classifier_set:
-            cl.fitness *= self.learning_rate_prediction * (
-                    accuracy_dict[cl] * cl.numerosity / accuracy_sum - cl.fitness)
+            cl.fitness += self.learning_rate_prediction * (
+                    accuracy_dict[cl] * (cl.numerosity / (accuracy_sum - cl.fitness)))
 
     def _classifier_accuracy(self, classifier) -> float:
         return 1.0 if classifier.epsilon <= self._epsilon_zero else self._learning_rate_fitness * (
