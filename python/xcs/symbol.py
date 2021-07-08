@@ -68,7 +68,4 @@ class Symbol(ISymbol[SymbolType]):
         return str(self.value)
 
     def __eq__(self, other):
-        if isinstance(other, Symbol):
-            return self.value == other.value
-        else:
-            return False
+        return self.value == getattr(other, 'value', other)

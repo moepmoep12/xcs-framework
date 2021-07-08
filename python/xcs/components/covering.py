@@ -88,12 +88,15 @@ class CoveringComponent(ICoveringComponent):
 
     @property
     def wildcard_probability(self) -> float:
+        """
+        :return: The probability for a symbol to become a wildcard.
+        """
         return self._wildcard_probability
 
     @wildcard_probability.setter
     def wildcard_probability(self, value: float):
         """
-        :param value: Must be number in range [0.0, 1.0].
+        :param value: The probability for a symbol to become a wildcard. Number in range [0.0, 1.0].
         :raises:
             OutOfRangeException: If wild_card_probability is not a number in range [0.0, 1.0].
         """

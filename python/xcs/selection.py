@@ -3,7 +3,6 @@ from typing import Collection, TypeVar, Callable, Dict
 from overrides import overrides
 from sys import maxsize as max_int
 import random
-import operator
 
 from xcs.classifier import Classifier
 from xcs.exceptions import OutOfRangeException, WrongStrictTypeException
@@ -36,6 +35,7 @@ class IClassifierSelectionStrategy(ABC):
         pass
 
 
+# todo: docstring
 class GreedySelection(IClassifierSelectionStrategy):
 
     @overrides
@@ -47,9 +47,10 @@ class GreedySelection(IClassifierSelectionStrategy):
         for i, cl in enumerate(classifier_set):
             scores[i] = score_function(cl)
 
-        return random.choice(max(scores.items(), key=operator.itemgetter(1)))
+        return max(scores, key=scores.get)
 
 
+# todo: docstring
 class TournamentSelection(IClassifierSelectionStrategy):
 
     def __init__(self, tournament_size: int):
@@ -71,7 +72,7 @@ class TournamentSelection(IClassifierSelectionStrategy):
     def select_classifier(self,
                           classifier_set: Collection[Classifier[SymbolType, ActionType]],
                           score_function: score_function_type) -> int:
-        # to-do: fix bug with negative values
+        # todo: fix bug with negative values
         best: Classifier[SymbolType, ActionType] = None
         best_index = 0
         indices = [i for i in range(len(classifier_set))]
@@ -87,8 +88,9 @@ class TournamentSelection(IClassifierSelectionStrategy):
         return best_index
 
 
+# todo: docstring
 class RouletteWheelSelection(IClassifierSelectionStrategy):
-    # to-do: fix bug with negative values
+    # todo: fix bug with negative values
     @overrides
     def select_classifier(self,
                           classifier_set: Collection[Classifier[SymbolType, ActionType]],

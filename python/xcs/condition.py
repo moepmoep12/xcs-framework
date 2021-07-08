@@ -1,6 +1,6 @@
 from .symbol import ISymbol, WildcardSymbol
 from .state import State
-from .exceptions import *
+from .exceptions import EmptyCollectionException, WrongSubTypeException, OutOfRangeException, WrongStrictTypeException
 
 from typing import Collection, Generic, TypeVar, Tuple
 

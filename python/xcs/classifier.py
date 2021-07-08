@@ -12,16 +12,18 @@ SymbolType = TypeVar('SymbolType')
 ActionType = TypeVar('ActionType')
 
 
+# todo: serialization?
 class Classifier(Generic[SymbolType, ActionType]):
     """
     A classifier represents a rule of the form 'if CONDITION then ACTION'.
     """
 
-    # to-do: use dataclass for initial values?
-    def __init__(self, condition: Condition[SymbolType], action: ActionType):
+    # todo: use dataclass for initial values?
+    def __init__(self, condition: Condition[SymbolType], action: ActionType, **kwargs):
         """
         :param condition: The condition under which this classifier is active.
         :param action: The action to execute if this classifier is active.
+        :param kwargs: Key worded arguments.
         :raises:
             NoneValueException: If any of the required arguments is None.
             WrongSubTypeException: If the condition is not of type Condition.
@@ -35,13 +37,12 @@ class Classifier(Generic[SymbolType, ActionType]):
 
         self._condition: Condition[SymbolType] = condition
         self._action: ActionType = action
-        self._experience: int = 0
-        self._fitness: float = float_info.epsilon
-        self._numerosity: int = 1
-        self._prediction: float = float_info.epsilon
-        self._epsilon: float = float_info.epsilon
-        self._action_set_size: float = 1
-        self._age: int = 0
+        self._experience: int = kwargs.get('exp', 0)
+        self._fitness: float = kwargs.get('f', float_info.epsilon)
+        self._numerosity: int = kwargs.get('n', 1)
+        self._prediction: float = kwargs.get('p', float_info.epsilon)
+        self._epsilon: float = kwargs.get('e', float_info.epsilon)
+        self._action_set_size: float = kwargs.get('a', 1)
 
     @property
     def condition(self) -> Condition[SymbolType]:
@@ -58,45 +59,41 @@ class Classifier(Generic[SymbolType, ActionType]):
         return self._action
 
     @property
-    def age(self) -> int:
-        """
-        :return: The age of this classifier.
-        """
-        return self._age
-
-    @age.setter
-    def age(self, value: int):
-        """
-        :param value: The age of this classifier.
-        :raises:
-            OutOfRangeException: If value is not in range [0, inf].
-        """
-        if not isinstance(value, Number) or value < 0:
-            raise OutOfRangeException(1, inf, value)
-
-        self._age = value
-
-    @property
     def fitness(self) -> float:
         """
         :return: The fitness value f of the classifier.
         """
         return self._fitness
 
-    # To-Do: Restrict to positive values only?
     @fitness.setter
     def fitness(self, value: float):
+        """
+        :param value: The fitness value f of the classifier.
+        :raises:
+            OutOfRangeException: If value is not in range [0, inf].
+        """
+        if not isinstance(value, Number) or value < 0:
+            raise OutOfRangeException(0, inf, value)
+
         self._fitness = value
 
     @property
     def prediction(self) -> float:
         """
-        :return: The prediction for the received reward if the action is executed.
+        :return: The prediction p for the received reward if the action is executed.
         """
         return self._prediction
 
     @prediction.setter
     def prediction(self, value: float):
+        """
+        :param value: The prediction p for the received reward if the action is executed.
+        :raises:
+            WrongSubTypeException: If value is not a number.
+        """
+        if not isinstance(value, Number):
+            raise WrongSubTypeException(Number.__name__, type(value).__name__)
+
         self._prediction = value
 
     @property
@@ -108,6 +105,11 @@ class Classifier(Generic[SymbolType, ActionType]):
 
     @epsilon.setter
     def epsilon(self, value: float):
+        """
+        :param value: The error epsilon of the prediction in range [0, inf].
+        :raises:
+            OutOfRangeException: If value is not in range [0, inf].
+        """
         if not isinstance(value, Number) or value < 0:
             raise OutOfRangeException(0.0, inf, value)
         self._epsilon = value
@@ -161,16 +163,21 @@ class Classifier(Generic[SymbolType, ActionType]):
         self._experience += 1
 
     def subsumes(self, other) -> bool:
-        # TO-DO: Exceptions?
+        # TODO: Exceptions?
         """
         Checks whether this classifier could subsume other.
 
         :param other: Other classifier to check against.
         :return: Whether this classifier subsumes other.
         """
-        return self.action == getattr(other, 'action', None) \
-               and self.condition.is_more_general(getattr(other, 'condition', None))
+        return self.action == getattr(other, 'action', None) and self.condition.is_more_general(
+            getattr(other, 'condition', None))
 
     def __repr__(self):
-        return f"{str(self.condition)} : {self.action}, F:{self.fitness:.3f}, P:{self.prediction:.3f}, E:{self.epsilon:.3f}," \
-               f" N:{self.numerosity}, exp:{self.experience}, AS:{self.action_set_size:.3f}, AGE:{self.age} "
+        return f"{str(self.condition)} : {self.action}, " \
+               f"F:{self.fitness:.3f}, " \
+               f"P:{self.prediction:.3f}, " \
+               f"E:{self.epsilon:.3f}, " \
+               f"N:{self.numerosity}, " \
+               f"exp:{self.experience}, " \
+               f"AS:{self.action_set_size:.3f}"

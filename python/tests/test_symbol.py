@@ -39,6 +39,7 @@ class TestSymbol(TestCase):
         w: ISymbol = WildcardSymbol()
 
         self.assertTrue(s1 == s2)
+        self.assertTrue(s1 == self.val_str)
         self.assertFalse(s1 == s3)
         self.assertFalse(s1 == w)
         self.assertFalse(s4 == w)

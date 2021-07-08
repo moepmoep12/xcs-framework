@@ -27,7 +27,7 @@ class XcsState(Generic[SymbolType, ActionType]):
 
 class XCS(Generic[SymbolType, ActionType]):
 
-    # TO-DO: 1.Instantiate with a list of all available actions?
+    # TODO: 1.Instantiate with a list of all available actions?
     #        2.Optional initial population?
     def __init__(self,
                  population: Population[SymbolType, ActionType],
@@ -43,9 +43,9 @@ class XCS(Generic[SymbolType, ActionType]):
         self._available_actions = available_actions
         self._expects_reward: bool = False
         self._prev_state: XcsState = XcsState()
-        self._discovery_threshold = 5
         self._last_discovery_run = 0
         self._iteration = 0
+        self._action_set_subsumption: bool = True
 
     def query(self, state: State[SymbolType]) -> ActionType:
         """
@@ -79,13 +79,13 @@ class XCS(Generic[SymbolType, ActionType]):
                                                                                 is_explore=is_explore)
 
         self._expects_reward = True
+        self._iteration += 1
 
         # remember the state for updating later
         self._prev_state.action_set = ActionSet([cl for cl in match_set if cl.action == chosen_action.action])
         self._prev_state.chosen_action = chosen_action
         self._prev_state.env_state = state
         self._prev_state.is_explore = is_explore
-        self._iteration += 1
 
         return chosen_action.action
 
@@ -104,25 +104,53 @@ class XCS(Generic[SymbolType, ActionType]):
         self._expects_reward = False
         self.learning_component.update_set(self._prev_state.action_set, value)
 
+        if self._action_set_subsumption:
+            self._do_action_set_subsumption(self._prev_state.action_set)
+
         if self._prev_state.is_explore and self._prev_state.action_set is not None:
-            self._discover_classifier(self._prev_state.env_state, self._prev_state.action_set, do_subsumption=True)
+            discovered_classifier = self.discovery_component.discover(self._iteration, self._prev_state.env_state,
+                                                                      self._prev_state.action_set, )
+            for cl in discovered_classifier:
+                self._population.insert_classifier(cl, do_subsumption=True)
 
         if is_end_of_problem:
+            # reset previous state
             self._prev_state = XcsState()
 
-    def _discover_classifier(self, state: State[SymbolType], classifier_set, do_subsumption: bool = True):
-        average_age = sum([cl.age - self._last_discovery_run if cl.age > self._last_discovery_run else 0 for cl in
-                           classifier_set]) / len(classifier_set)
-        if average_age >= self._discovery_threshold:
-            self._last_discovery_run = self._iteration
-            classifier = self.discovery_component.discover(state, classifier_set)
-            for cl in classifier:
-                self._population.insert_classifier(cl, do_subsumption=do_subsumption)
+    # todo: fix bug where a classifier to be removed is not in the population
+    def _do_action_set_subsumption(self, action_set: ActionSet[SymbolType, ActionType]):
+        if len(action_set) <= 1:
+            return
 
+        most_general_classifier = None
+        for cl in action_set:
+            if self.population.subsumption_criteria.can_subsume(cl):
+                if most_general_classifier is None or cl.subsumes(most_general_classifier):
+                    most_general_classifier = cl
+
+        classifier_to_remove = []
+
+        if most_general_classifier is not None:
+            for cl in action_set:
+                if most_general_classifier.subsumes(cl):
+                    most_general_classifier.numerosity += cl.numerosity
+                    classifier_to_remove.append(cl)
+
+            for cl in classifier_to_remove:
+                self.population.remove_classifier(cl)
+                action_set.remove_classifier(cl)
+
+    # todo: docstring
+    @property
+    def population(self) -> Population[SymbolType, ActionType]:
+        return self._population
+
+    # todo: docstring
     @property
     def performance_component(self) -> IPerformanceComponent:
         return self._performance_component
 
+    # todo: docstring
     @performance_component.setter
     def performance_component(self, value: IPerformanceComponent):
         if not isinstance(value, IPerformanceComponent):
@@ -130,10 +158,12 @@ class XCS(Generic[SymbolType, ActionType]):
 
         self._performance_component = value
 
+    # todo: docstring
     @property
     def discovery_component(self) -> IDiscoveryComponent:
         return self._discovery_component
 
+    # todo: docstring
     @discovery_component.setter
     def discovery_component(self, value: IDiscoveryComponent):
         if not isinstance(value, IDiscoveryComponent):
@@ -141,10 +171,12 @@ class XCS(Generic[SymbolType, ActionType]):
 
         self._discovery_component = value
 
+    # todo: docstring
     @property
     def learning_component(self) -> ILearningComponent:
         return self._learning_component
 
+    # todo: docstring
     @learning_component.setter
     def learning_component(self, value: ILearningComponent):
         if not isinstance(value, ILearningComponent):

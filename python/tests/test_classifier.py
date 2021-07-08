@@ -48,6 +48,7 @@ class TestClassifier(TestCase):
         cl3 = Classifier(condition2, action2)
 
         self.assertTrue(cl1.subsumes(cl2))
+        self.assertFalse(cl1.subsumes(cl1))
         self.assertFalse(cl1.subsumes(cl3))
         self.assertFalse(cl2.subsumes(cl1))
         self.assertFalse(cl1.subsumes('ASD'))

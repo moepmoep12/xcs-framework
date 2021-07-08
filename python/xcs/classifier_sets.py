@@ -52,6 +52,16 @@ class ClassifierSet(Generic[SymbolType, ActionType]):
 
         self._classifier.append(__object)
 
+    def remove_classifier(self, classifier: Classifier[SymbolType, ActionType]) -> None:
+        """
+        Removes the classifier from this set.
+
+        :param classifier: The classifier to remove.
+        :raises:
+            ValueError: If the classifier is not present in this set.
+        """
+        self._classifier.remove(classifier)
+
     def get_available_actions(self) -> Set[ActionType]:
         """
         :return: Returns all unique actions in this collection.
@@ -59,6 +69,9 @@ class ClassifierSet(Generic[SymbolType, ActionType]):
         return set([cl.action for cl in self])
 
     def numerosity_sum(self) -> int:
+        """
+        :return: The sum of the numerosity of all classifier.
+        """
         return sum(cl.numerosity for cl in self)
 
 
@@ -67,7 +80,7 @@ class Population(ClassifierSet[SymbolType, ActionType]):
     A population is a set of classifier that represent the knowledge base of a LCS.
     """
 
-    # to-do: use settings/params dataclass?
+    # todo: use settings/params dataclass?
     def __init__(self, max_size: int,
                  subsumption_criteria: ISubsumptionCriteria,
                  deletion_selection: IClassifierSelectionStrategy = RouletteWheelSelection(),
@@ -88,6 +101,7 @@ class Population(ClassifierSet[SymbolType, ActionType]):
         self._deletion_exp_threshold = 20
         self._deletion_fitness_fraction = 0.1
 
+    # todo: docstring?
     def insert_classifier(self, __object: Classifier[SymbolType, ActionType], **kwargs) -> None:
         if not isinstance(__object, Classifier):
             raise WrongSubTypeException(Classifier.__name__, type(__object).__name__)
@@ -114,6 +128,7 @@ class Population(ClassifierSet[SymbolType, ActionType]):
         # classifier is new, add it
         self._classifier.append(__object)
 
+    # todo: docstring
     def trim_population(self, desired_size: int) -> None:
 
         while numerosity_sum := self.numerosity_sum() > desired_size:
@@ -121,7 +136,7 @@ class Population(ClassifierSet[SymbolType, ActionType]):
 
             def deletion_vote(cl: Classifier[SymbolType, ActionType]) -> float:
                 vote = cl.action_set_size * cl.numerosity
-                # to-do: implement check
+
                 if average_fitness > 0 and cl.fitness > 0 and cl.experience > self._deletion_exp_threshold and (
                         cl.fitness / cl.numerosity) < self._deletion_fitness_fraction * average_fitness:
                     vote *= average_fitness / (cl.fitness / cl.numerosity)
@@ -195,10 +210,10 @@ class Population(ClassifierSet[SymbolType, ActionType]):
 
 
 class MatchSet(ClassifierSet[SymbolType, ActionType]):
-    # TO-DO
+    # TODO
     pass
 
 
 class ActionSet(ClassifierSet[SymbolType, ActionType]):
-    # TO-DO
+    # TODO
     pass

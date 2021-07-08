@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 from overrides import overrides
-from typing import TypeVar, List, Collection, Set
+from typing import TypeVar, Collection, Set
 import copy
 import random
 from numbers import Number
@@ -23,16 +23,23 @@ class IDiscoveryComponent(ABC):
 
     @abstractmethod
     def discover(self,
+                 timestamp: int,
                  state: State[SymbolType],
                  classifier_set: ClassifierSet[SymbolType, ActionType]) -> ClassifierSet[SymbolType, ActionType]:
         """
         Discovers new classifier based on existing classifier in a specific state.
 
+        :param timestamp: The current timestamp. (for example the current iteration)
         :param state: The current state.
         :param classifier_set: The set used for generating new classifier (== current knowledge base).
         :return: The newly created classifiers.
         """
         pass
+
+
+# Decorated attribute for classifier.
+# Keeps track at which timestamp the GA was called on the Action set the classifier belonged to.
+TIMESTAMP = 'timestamp_since_ga'
 
 
 class GeneticAlgorithm(IDiscoveryComponent):
@@ -42,7 +49,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
     New classifier are created through crossover and mutation.
     """
 
-    # TO-DO: settings/params class?
+    # TODO: settings/params class?
     def __init__(self,
                  selection_strategy: IClassifierSelectionStrategy,
                  available_actions: Collection[ActionType],
@@ -70,10 +77,13 @@ class GeneticAlgorithm(IDiscoveryComponent):
         self.selection_strategy = selection_strategy
         self.fitness_reduction = fitness_reduction
         self.crossover_probability = crossover_probability
+        self._discovery_threshold: int = 25
         self._available_actions: Set[ActionType] = set(available_actions)
 
+    # todo: docstring?
     @overrides
     def discover(self,
+                 timestamp: int,
                  state: State[SymbolType],
                  classifier_set: ClassifierSet[SymbolType, ActionType]) -> ClassifierSet[SymbolType, ActionType]:
 
@@ -82,15 +92,20 @@ class GeneticAlgorithm(IDiscoveryComponent):
         if classifier_set is None or len(classifier_set) == 0:
             raise EmptyCollectionException('classifier_set')
 
+        if not self._should_run(timestamp, classifier_set):
+            return ClassifierSet([])
+
         parent1 = self._choose_parent(classifier_set)
         parent2 = self._choose_parent(classifier_set)
 
-        child1 = self._generate_child(parent1)
-        child2 = self._generate_child(parent2)
+        child1 = self._generate_child(parent1, timestamp)
+        child2 = self._generate_child(parent2, timestamp)
 
         self._crossover(child1, child2)
         self._mutate(child1, state)
         self._mutate(child2, state)
+
+        self._update_timestamps(timestamp, classifier_set)
 
         return ClassifierSet([child1, child2])
 
@@ -185,8 +200,32 @@ class GeneticAlgorithm(IDiscoveryComponent):
 
         self._crossover_probability = value
 
+    def _should_run(self,
+                    timestamp: int,
+                    classifier_set: ClassifierSet[SymbolType, ActionType]) -> bool:
+        """
+        :return: Whether the GA should operate on this classifier_set.
+                 This is true if the average time since the last GA is greater than a threshold.
+        """
+        average_timestamp = 0
+        numerosity_sum = classifier_set.numerosity_sum()
+        for cl in classifier_set:
+            # handle classifier that were created outside of this GA
+            if not getattr(cl, TIMESTAMP, False):
+                setattr(cl, TIMESTAMP, timestamp)
+            average_timestamp += getattr(cl, TIMESTAMP) / numerosity_sum * cl.numerosity
+
+        return timestamp - average_timestamp >= self._discovery_threshold
+
     @staticmethod
-    def _generate_child(parent: Classifier[SymbolType, ActionType]) -> Classifier[SymbolType, ActionType]:
+    def _update_timestamps(timestamp: int,
+                           classifier_set: ClassifierSet[SymbolType, ActionType]) -> None:
+        for cl in classifier_set:
+            setattr(cl, TIMESTAMP, timestamp)
+
+    @staticmethod
+    def _generate_child(parent: Classifier[SymbolType, ActionType], timestamp: int) \
+            -> Classifier[SymbolType, ActionType]:
         """
         Generates a child classifier from a parent. Uses deep copy.
         """
@@ -194,6 +233,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
         child.fitness = parent.fitness / parent.numerosity
         child.prediction = parent.prediction
         child.epsilon = parent.epsilon
+        setattr(child, TIMESTAMP, timestamp)
         return child
 
     def _choose_parent(self, classifier_set: ClassifierSet[SymbolType, ActionType]) \
@@ -227,7 +267,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
         performed_crossover = False
 
         if random.random() < self.crossover_probability:
-            # TO-DO: Perform crossover according to strategy
+            # TODO: Perform crossover according to strategy
             performed_crossover = self._two_point_crossover(cl1, cl2)
 
         if performed_crossover:

@@ -7,18 +7,20 @@ class TestGeneticAlgorithm(TestCase):
         from xcs.condition import Condition
         from xcs.symbol import Symbol, WildcardSymbol
         from xcs.classifier import Classifier
-        from xcs.components.discovery import GeneticAlgorithm
+        from xcs.components.discovery import GeneticAlgorithm, TIMESTAMP
         from tests.stubs import SelectionStub
         ga = GeneticAlgorithm(SelectionStub(), [0])
         condition: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         action: int = 1
+        timestamp: int = 55
         parent: Classifier[str, int] = Classifier(condition, action)
         parent.fitness = 100
         parent.prediction = 50
         parent.epsilon = 10
         parent._experience = 22
         parent._numerosity = 10
-        child: Classifier[str, int] = ga._generate_child(parent)
+        setattr(parent, TIMESTAMP, 0)
+        child: Classifier[str, int] = ga._generate_child(parent, timestamp)
 
         self.assertNotEqual(parent, child)
         self.assertEqual(parent.condition, child.condition)
@@ -28,6 +30,31 @@ class TestGeneticAlgorithm(TestCase):
         self.assertNotEqual(parent.experience, child.experience)
         self.assertNotEqual(parent.numerosity, child.numerosity)
         self.assertNotEqual(parent.fitness, child.fitness)
+        self.assertNotEqual(getattr(parent, TIMESTAMP), getattr(child, TIMESTAMP))
+
+    def test__should_run(self):
+        from xcs.condition import Condition
+        from xcs.symbol import Symbol, WildcardSymbol
+        from xcs.classifier import Classifier
+        from xcs.components.discovery import GeneticAlgorithm, TIMESTAMP
+        from xcs.classifier_sets import ActionSet
+        from tests.stubs import SelectionStub
+        ga = GeneticAlgorithm(SelectionStub(), [0])
+        ga._discovery_threshold = 5
+        condition: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
+        action: int = 1
+        timestamp: int = 55
+        cl1: Classifier[str, int] = Classifier(condition, action)
+        cl2: Classifier[str, int] = Classifier(condition, action)
+        setattr(cl2, TIMESTAMP, 1)
+        cl3: Classifier[str, int] = Classifier(condition, action)
+        cl3.numerosity = 10
+        setattr(cl3, TIMESTAMP, 1)
+
+        self.assertFalse(ga._should_run(timestamp, ActionSet([cl1])))
+        self.assertTrue(ga._should_run(timestamp, ActionSet([cl2])))
+        self.assertTrue(ga._should_run(timestamp, ActionSet([cl2, cl1])))
+        self.assertTrue(ga._should_run(timestamp, ActionSet([cl2, cl1, cl3])))
 
     def test__swap_symbols_one_element(self):
         from xcs.condition import Condition

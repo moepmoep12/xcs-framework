@@ -4,7 +4,6 @@ from overrides import overrides
 from random import shuffle, choice
 from sys import float_info
 from dataclasses import dataclass
-import operator
 
 from xcs.classifier_sets import MatchSet, Population
 from xcs.state import State
@@ -17,12 +16,14 @@ SymbolType = TypeVar('SymbolType')
 ActionType = TypeVar('ActionType')
 
 
+# todo: docstring
 @dataclass
 class ChosenAction(Generic[ActionType]):
     action: ActionType
     expected_reward: float
 
 
+# todo: docstring
 class IPerformanceComponent(ABC):
 
     @abstractmethod
@@ -38,11 +39,13 @@ class IPerformanceComponent(ABC):
         """
         pass
 
+    # todo: docstring
     @abstractmethod
     def choose_action(self, match_set: MatchSet[SymbolType, ActionType], is_explore: bool = False) -> ChosenAction:
         pass
 
 
+# todo: docstring
 class PerformanceComponent(IPerformanceComponent):
 
     def __init__(self, min_diff_actions: int,
@@ -64,7 +67,6 @@ class PerformanceComponent(IPerformanceComponent):
 
         match_set: MatchSet[SymbolType, ActionType] = MatchSet()
         for cl in population:
-            cl.age += 1
             if cl.condition.matches(state):
                 match_set.insert_classifier(cl)
 
@@ -96,6 +98,7 @@ class PerformanceComponent(IPerformanceComponent):
 
         return ChosenAction(action, prediction_array[action])
 
+    # todo: docstring
     @staticmethod
     def _generate_prediction_array(match_set: MatchSet[SymbolType, ActionType]) -> Dict[ActionType, float]:
         prediction_array: Dict[ActionType, float] = dict()
@@ -114,10 +117,12 @@ class PerformanceComponent(IPerformanceComponent):
 
         return prediction_array
 
+    # todo: docstring
     @property
     def covering_component(self) -> ICoveringComponent:
         return self._covering_component
 
+    # todo: docstring
     @covering_component.setter
     def covering_component(self, value: ICoveringComponent):
         if not isinstance(value, ICoveringComponent):

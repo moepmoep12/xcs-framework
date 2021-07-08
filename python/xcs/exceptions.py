@@ -1,3 +1,5 @@
+# todo: docstrings
+
 class WrongStrictTypeException(Exception):
     def __init__(self, expected: str, actual: str):
         super().__init__(f"Expected type '{expected}' but got '{actual}' instead.")

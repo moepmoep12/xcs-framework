@@ -27,6 +27,30 @@ class TestClassifierSet(TestCase):
         self.assertTrue(cl_set3[2] == cl3)
         self.assertTrue(available_actions == set([1, 0]))
 
+    def test_remove_classifier(self):
+        from xcs.classifier_sets import ClassifierSet
+        from xcs.classifier import Classifier
+        from xcs.condition import Condition
+        from xcs.symbol import Symbol, WildcardSymbol
+
+        cond1: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
+        cond2: Condition[str] = Condition([Symbol('0'), WildcardSymbol(), Symbol('1')])
+        cl1: Classifier[str, int] = Classifier(condition=cond1, action=1)
+        cl2: Classifier[str, int] = Classifier(condition=cond1, action=0)
+        cl3: Classifier[str, int] = Classifier(condition=cond2, action=0)
+        cl4: Classifier[str, int] = Classifier(condition=cond2, action=1)
+        cl_set: ClassifierSet[str, int] = ClassifierSet([cl1, cl2, cl3])
+
+        with self.assertRaises(ValueError):
+            cl_set.remove_classifier(cl4)
+
+        cl_set.remove_classifier(cl1)
+        self.assertTrue(cl1 not in cl_set)
+        self.assertTrue(cl2 in cl_set and cl3 in cl_set)
+
+        with self.assertRaises(ValueError):
+            cl_set.remove_classifier(cl1)
+
 
 class TestPopulation(TestCase):
 
