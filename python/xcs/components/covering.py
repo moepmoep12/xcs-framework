@@ -3,14 +3,14 @@ from typing import TypeVar, List
 from overrides import overrides
 import copy
 import random
-from numbers import Number
 
 from xcs.classifier_sets import ClassifierSet
 from xcs.state import State
 from xcs.classifier import Classifier
 from xcs.condition import Condition
 from xcs.symbol import WildcardSymbol, Symbol, ISymbol
-from xcs.exceptions import OutOfRangeException, EmptyCollectionException
+from xcs.exceptions import EmptyCollectionException
+from xcs.constants import CoveringConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -44,11 +44,11 @@ class CoveringComponent(ICoveringComponent):
     Basic CoveringComponent.
     """
 
-    def __init__(self, wild_card_probability: float):
+    def __init__(self, covering_constants: CoveringConstants = CoveringConstants()):
         """
-        :param wild_card_probability: Must be number in range [0.0, 1.0].
+        :param covering_constants: Constants used in this component.
         """
-        self.wildcard_probability = wild_card_probability
+        self._covering_constants: CoveringConstants = covering_constants
 
     @overrides
     def covering_operation(self,
@@ -76,7 +76,7 @@ class CoveringComponent(ICoveringComponent):
             condition_symbols: List[ISymbol[SymbolType]] = [None] * len(current_state)
 
             for i in range(len(condition_symbols)):
-                if random.random() < self._wildcard_probability:
+                if random.random() < self.covering_constants.wildcard_probability:
                     condition_symbols[i] = WildcardSymbol()
                 else:
                     condition_symbols[i] = Symbol(copy.deepcopy(current_state[i]))
@@ -87,20 +87,8 @@ class CoveringComponent(ICoveringComponent):
         return result
 
     @property
-    def wildcard_probability(self) -> float:
+    def covering_constants(self) -> CoveringConstants:
         """
-        :return: The probability for a symbol to become a wildcard.
+        :return: Covering constants used in this component.
         """
-        return self._wildcard_probability
-
-    @wildcard_probability.setter
-    def wildcard_probability(self, value: float):
-        """
-        :param value: The probability for a symbol to become a wildcard. Number in range [0.0, 1.0].
-        :raises:
-            OutOfRangeException: If wild_card_probability is not a number in range [0.0, 1.0].
-        """
-        if not isinstance(value, Number) or value < 0.0 or value > 1.0:
-            raise OutOfRangeException(0.0, 1.0, value)
-
-        self._wildcard_probability = value
+        return self._covering_constants

@@ -16,15 +16,19 @@ SymbolType = TypeVar('SymbolType')
 ActionType = TypeVar('ActionType')
 
 
-# todo: docstring
 @dataclass
 class ChosenAction(Generic[ActionType]):
+    """
+    Struct that groups an action and the expected payoff upon execution.
+    """
     action: ActionType
     expected_reward: float
 
 
-# todo: docstring
 class IPerformanceComponent(ABC):
+    """
+    Interface. An IPerformanceComponent is responsible for generating the match set and action selection.
+    """
 
     @abstractmethod
     def generate_match_set(self, population: Population[SymbolType, ActionType], state: State[SymbolType]) -> \
@@ -39,14 +43,24 @@ class IPerformanceComponent(ABC):
         """
         pass
 
-    # todo: docstring
     @abstractmethod
     def choose_action(self, match_set: MatchSet[SymbolType, ActionType], is_explore: bool = False) -> ChosenAction:
+        """
+        Chooses the action to be executed.
+
+        :param match_set: The set of classifier that match to the given state.
+        :param is_explore: Whether this iteration is an explore-iteration.
+        :return: The chosen action.
+        """
         pass
 
 
-# todo: docstring
 class PerformanceComponent(IPerformanceComponent):
+    """
+    A basic Performance Component.
+    Implementation based upon the paper 'An algorithmic description of XCS' by Butz & Wilson 2000
+    (https://doi.org/10.1007/s005000100111).
+    """
 
     def __init__(self, min_diff_actions: int,
                  covering_component: ICoveringComponent,
@@ -98,9 +112,12 @@ class PerformanceComponent(IPerformanceComponent):
 
         return ChosenAction(action, prediction_array[action])
 
-    # todo: docstring
     @staticmethod
     def _generate_prediction_array(match_set: MatchSet[SymbolType, ActionType]) -> Dict[ActionType, float]:
+        """
+        :param match_set: The classifier under consideration.
+        :return: A dict where for each available action a prediction is assigned.
+        """
         prediction_array: Dict[ActionType, float] = dict()
         fitness_sums: Dict[ActionType, float] = dict()
         for cl in match_set:
@@ -117,14 +134,20 @@ class PerformanceComponent(IPerformanceComponent):
 
         return prediction_array
 
-    # todo: docstring
     @property
     def covering_component(self) -> ICoveringComponent:
+        """
+        :return: The covering component used for covering.
+        """
         return self._covering_component
 
-    # todo: docstring
     @covering_component.setter
     def covering_component(self, value: ICoveringComponent):
+        """
+        :param value: An object of type ICoveringComponent.
+        :raises:
+            WrongSubTypeException: If value is not a subtype of ICoveringComponent.
+        """
         if not isinstance(value, ICoveringComponent):
             raise WrongSubTypeException(ICoveringComponent.__name__, type(value).__name__)
 

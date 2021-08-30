@@ -9,7 +9,7 @@ class TestGeneticAlgorithm(TestCase):
         from xcs.classifier import Classifier
         from xcs.components.discovery import GeneticAlgorithm, TIMESTAMP
         from tests.stubs import SelectionStub
-        ga = GeneticAlgorithm(SelectionStub(), [0])
+        ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         condition: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         action: int = 1
         timestamp: int = 55
@@ -39,8 +39,8 @@ class TestGeneticAlgorithm(TestCase):
         from xcs.components.discovery import GeneticAlgorithm, TIMESTAMP
         from xcs.classifier_sets import ActionSet
         from tests.stubs import SelectionStub
-        ga = GeneticAlgorithm(SelectionStub(), [0])
-        ga._discovery_threshold = 5
+        ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
+        ga.ga_constants.ga_threshold = 5
         condition: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         action: int = 1
         timestamp: int = 55
@@ -62,7 +62,7 @@ class TestGeneticAlgorithm(TestCase):
         from xcs.components.discovery import GeneticAlgorithm
         from tests.stubs import SelectionStub
         import copy
-        ga = GeneticAlgorithm(SelectionStub(), [0])
+        ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         symbols1 = [Symbol('1'), WildcardSymbol(), Symbol('1')]
         symbols2 = [Symbol('0'), Symbol('0'), Symbol('0')]
 
@@ -87,7 +87,7 @@ class TestGeneticAlgorithm(TestCase):
         from xcs.components.discovery import GeneticAlgorithm
         from tests.stubs import SelectionStub
         import copy
-        ga = GeneticAlgorithm(SelectionStub(), [0])
+        ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         symbols1 = [Symbol('1'), WildcardSymbol(), Symbol('1')]
         symbols2 = [Symbol('0'), Symbol('0'), Symbol('0')]
         condition1: Condition[str] = Condition(copy.deepcopy(symbols1))
@@ -109,7 +109,7 @@ class TestGeneticAlgorithm(TestCase):
         from xcs.exceptions import NoneValueException, EmptyCollectionException, OutOfRangeException
         from tests.stubs import SelectionStub
         import copy
-        ga = GeneticAlgorithm(SelectionStub(), [0])
+        ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         symbols1 = [Symbol('1'), WildcardSymbol(), Symbol('1')]
         symbols2 = [Symbol('0'), Symbol('0')]
         condition0: Condition[str] = Condition([Symbol('1')])
@@ -149,55 +149,10 @@ class TestGeneticAlgorithm(TestCase):
         with self.assertRaises(ValueError):
             ga._swap_symbols(condition1, condition3, 2, 1)
 
-    def test_mutation_rate_setter(self):
-        from xcs.components.discovery import GeneticAlgorithm
-        from tests.stubs import SelectionStub
-        ga = GeneticAlgorithm(SelectionStub(), [0])
-        from xcs.exceptions import OutOfRangeException
-
-        with self.assertRaises(OutOfRangeException):
-            ga.mutation_rate = -1
-
-        with self.assertRaises(OutOfRangeException):
-            ga.mutation_rate = 2
-
-        with self.assertRaises(OutOfRangeException):
-            ga.mutation_rate = None
-
-    def test_crossover_probability_setter(self):
-        from xcs.components.discovery import GeneticAlgorithm
-        from tests.stubs import SelectionStub
-        ga = GeneticAlgorithm(SelectionStub(), [0])
-        from xcs.exceptions import OutOfRangeException
-
-        with self.assertRaises(OutOfRangeException):
-            ga.crossover_probability = -1
-
-        with self.assertRaises(OutOfRangeException):
-            ga.crossover_probability = 2
-
-        with self.assertRaises(OutOfRangeException):
-            ga.crossover_probability = None
-
-    def test_fitness_reduction_setter(self):
-        from xcs.components.discovery import GeneticAlgorithm
-        from tests.stubs import SelectionStub
-        ga = GeneticAlgorithm(SelectionStub(), [0])
-        from xcs.exceptions import OutOfRangeException
-
-        with self.assertRaises(OutOfRangeException):
-            ga.fitness_reduction = -1
-
-        with self.assertRaises(OutOfRangeException):
-            ga.fitness_reduction = 2
-
-        with self.assertRaises(OutOfRangeException):
-            ga.fitness_reduction = None
-
     def test_selection_strategy_setter(self):
         from xcs.components.discovery import GeneticAlgorithm
         from tests.stubs import SelectionStub
-        ga = GeneticAlgorithm(SelectionStub(), [0])
+        ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         from xcs.exceptions import WrongSubTypeException
 
         with self.assertRaises(WrongSubTypeException):

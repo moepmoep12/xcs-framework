@@ -94,8 +94,12 @@ class TestPopulation(TestCase):
         cl2: Classifier[str, int] = Classifier(condition=cond1, action=0)
         cl3: Classifier[str, int] = Classifier(condition=cond2, action=0)
 
-        population: Population[str, int] = Population(max_size=3, subsumption_criteria=SubsumptionStub(),
+        max_size = 3
+
+        population: Population[str, int] = Population(max_size=max_size, subsumption_criteria=SubsumptionStub(),
                                                       classifier=[cl1, cl2, cl3])
+        population2: Population[str, int] = Population(max_size=max_size, subsumption_criteria=SubsumptionStub(),
+                                                       classifier=[cl1, cl2, cl3])
 
         population.trim_population(desired_size=population.max_size)
         self.assertEqual(population.numerosity_sum(), population.max_size)
@@ -103,3 +107,9 @@ class TestPopulation(TestCase):
         population.trim_population(desired_size=1)
         self.assertEqual(len(population), 1)
         self.assertEqual(population.numerosity_sum(), 1)
+
+        with self.assertRaises(AssertionError):
+            population.trim_population(max_size + 1)
+
+        population2.trim_population(0)
+        self.assertEqual(population2.numerosity_sum(), 0)

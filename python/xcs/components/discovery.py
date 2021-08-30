@@ -3,15 +3,15 @@ from overrides import overrides
 from typing import TypeVar, Collection, Set
 import copy
 import random
-from numbers import Number
 
 from xcs.classifier import Classifier
 from xcs.classifier_sets import ClassifierSet
-from xcs.symbol import WildcardSymbol
+from xcs.symbol import WildcardSymbol, Symbol
 from xcs.condition import Condition
 from xcs.state import State
-from xcs.selection import IClassifierSelectionStrategy
+from xcs.selection import IClassifierSelectionStrategy, RouletteWheelSelection
 from xcs.exceptions import *
+from xcs.constants import GAConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -49,22 +49,14 @@ class GeneticAlgorithm(IDiscoveryComponent):
     New classifier are created through crossover and mutation.
     """
 
-    # TODO: settings/params class?
     def __init__(self,
-                 selection_strategy: IClassifierSelectionStrategy,
                  available_actions: Collection[ActionType],
-                 mutation_rate: float = 0.03,
-                 mutate_action: bool = False,
-                 fitness_reduction: float = 0.1,
-                 crossover_probability: float = 0.5):
+                 selection_strategy: IClassifierSelectionStrategy = RouletteWheelSelection(),
+                 ga_constants: GAConstants = GAConstants()):
         """
         :param selection_strategy: The strategy used for selecting parent classifier.
         :param available_actions: Available actions to choose from when mutating the action of a classifier.
-        :param mutation_rate: The value of the rate of mutation as a float in range [0.0, 1.0].
-        :param mutate_action: Whether the action of a classifier has a chance to be mutated during discovery.
-        :param fitness_reduction: Float in range [0.0, 1.0] indicating how much the fitness of a child classifier
-                                  will be reduced when it is created without crossover.
-        :param crossover_probability: The chance in the range [0.0, 1.0] for doing crossover in classifier discovery.
+        :param ga_constants: Constants used in this ga.
         :raises:
             EmptyCollectionException: If available_actions is empty.
         """
@@ -72,21 +64,31 @@ class GeneticAlgorithm(IDiscoveryComponent):
         if available_actions is None or len(available_actions) == 0:
             raise EmptyCollectionException('available_actions')
 
-        self.mutation_rate = mutation_rate
-        self.mutate_action = mutate_action
         self.selection_strategy = selection_strategy
-        self.fitness_reduction = fitness_reduction
-        self.crossover_probability = crossover_probability
-        self._discovery_threshold: int = 25
         self._available_actions: Set[ActionType] = set(available_actions)
+        self._ga_constants: GAConstants = ga_constants
+        # work around for switch-case
+        self._crossover_methods = {
+            GAConstants.CrossoverMethod.UNIFORM: self._uniform_crossover,
+            GAConstants.CrossoverMethod.ONE_POINT: self._one_point_crossover,
+            GAConstants.CrossoverMethod.TWO_POINT: self._two_point_crossover
+        }
 
-    # todo: docstring?
     @overrides
     def discover(self,
                  timestamp: int,
                  state: State[SymbolType],
                  classifier_set: ClassifierSet[SymbolType, ActionType]) -> ClassifierSet[SymbolType, ActionType]:
+        """
+        Discovers new classifier based on existing classifier in a specific state.
 
+        :param timestamp: The current timestamp. (for example the current iteration)
+        :param state: The current state.
+        :param classifier_set: The set used for generating new classifier (== current knowledge base).
+        :return: The newly created classifiers.
+        :raises:
+            EmptyCollectionException: If the state or classifier_set is empty.
+        """
         if state is None or len(state) == 0:
             raise EmptyCollectionException('state')
         if classifier_set is None or len(classifier_set) == 0:
@@ -110,37 +112,11 @@ class GeneticAlgorithm(IDiscoveryComponent):
         return ClassifierSet([child1, child2])
 
     @property
-    def mutation_rate(self) -> float:
+    def ga_constants(self) -> GAConstants:
         """
-        :return: The rate of mutation when discovering new classifier. In range [0.0, 1.0].
+        :return: Constants used in this ga.
         """
-        return self._mutation_rate
-
-    @mutation_rate.setter
-    def mutation_rate(self, value: float):
-        """
-        :param value: The value of the rate of mutation as a float in range [0.0, 1.0].
-        :raises:
-            OutOfRangeException: If value is not a float in range [0.0, 1.0]
-        """
-        if not isinstance(value, Number) or value < 0.0 or value > 1.0:
-            raise OutOfRangeException(0.0, 1.0, value)
-
-        self._mutation_rate = value
-
-    @property
-    def mutate_action(self) -> bool:
-        """
-        :return: Whether the action will be mutated when discovering new classifier.
-        """
-        return self._mutate_action
-
-    @mutate_action.setter
-    def mutate_action(self, value: bool):
-        """
-        :param value: Whether the action of a classifier has a chance to be mutated during discovery.
-        """
-        self._mutate_action = value
+        return self._ga_constants
 
     @property
     def selection_strategy(self) -> IClassifierSelectionStrategy:
@@ -161,45 +137,6 @@ class GeneticAlgorithm(IDiscoveryComponent):
 
         self._selection_strategy = value
 
-    @property
-    def fitness_reduction(self) -> float:
-        """
-        :return: The percentage reduction of the fitness of a child classifier when created without crossover.
-                 In range [0.0, 1.0].
-        """
-        return self._fitness_reduction
-
-    @fitness_reduction.setter
-    def fitness_reduction(self, value: float):
-        """
-        :param value: Float in range [0.0, 1.0].
-        : raises:
-            OutOfRangeException: If value is not a float in range [0.0, 1.0].
-        """
-        if not isinstance(value, Number) or value < 0.0 or value > 1.0:
-            raise OutOfRangeException(0.0, 1.0, value)
-
-        self._fitness_reduction = value
-
-    @property
-    def crossover_probability(self) -> float:
-        """
-        :return: The chance in the range [0.0, 1.0] for doing crossover in classifier discovery.
-        """
-        return self._crossover_probability
-
-    @crossover_probability.setter
-    def crossover_probability(self, value: float):
-        """
-        :param value: Float in range [0.0, 1.0].
-        : raises:
-            OutOfRangeException: If value is not a float in range [0.0, 1.0].
-        """
-        if not isinstance(value, Number) or value < 0.0 or value > 1.0:
-            raise OutOfRangeException(0.0, 1.0, value)
-
-        self._crossover_probability = value
-
     def _should_run(self,
                     timestamp: int,
                     classifier_set: ClassifierSet[SymbolType, ActionType]) -> bool:
@@ -215,7 +152,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
                 setattr(cl, TIMESTAMP, timestamp)
             average_timestamp += getattr(cl, TIMESTAMP) / numerosity_sum * cl.numerosity
 
-        return timestamp - average_timestamp >= self._discovery_threshold
+        return timestamp - average_timestamp >= self.ga_constants.ga_threshold
 
     @staticmethod
     def _update_timestamps(timestamp: int,
@@ -248,13 +185,13 @@ class GeneticAlgorithm(IDiscoveryComponent):
         Mutates a classifier by changing some of its condition symbols and the action if enabled.
         """
         for i in range(len(classifier.condition)):
-            if random.random() < self.mutation_rate:
+            if random.random() < self.ga_constants.mutation_rate:
                 if isinstance(classifier.condition[i], WildcardSymbol):
-                    classifier.condition[i] = state[i]
+                    classifier.condition[i] = Symbol(copy.deepcopy(state[i]))
                 else:
                     classifier.condition[i] = WildcardSymbol()
 
-        if self.mutate_action:
+        if self.ga_constants.mutate_action:
             actions = set(self.available_actions)
             actions.remove(classifier.action)
             if len(actions) > 0:
@@ -266,17 +203,17 @@ class GeneticAlgorithm(IDiscoveryComponent):
         """
         performed_crossover = False
 
-        if random.random() < self.crossover_probability:
-            # TODO: Perform crossover according to strategy
-            performed_crossover = self._two_point_crossover(cl1, cl2)
+        if random.random() < self.ga_constants.crossover_probability:
+            crossover_method = self._crossover_methods[self.ga_constants.crossover_method]
+            performed_crossover = crossover_method(cl1, cl2)
 
         if performed_crossover:
             cl1.prediction = cl2.prediction = (cl1.prediction + cl2.prediction) / 2
             cl1.epsilon = cl2.epsilon = (cl1.epsilon + cl2.epsilon) / 2
             cl1.fitness = cl2.fitness = (cl1.fitness + cl2.fitness) / 2
 
-        cl1.fitness *= self.fitness_reduction
-        cl2.fitness *= self.fitness_reduction
+        cl1.fitness *= self.ga_constants.fitness_reduction
+        cl2.fitness *= self.ga_constants.fitness_reduction
 
     def _uniform_crossover(self,
                            cl1: Classifier[SymbolType, ActionType],

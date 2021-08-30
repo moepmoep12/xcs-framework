@@ -4,8 +4,10 @@ from math import inf
 
 from .classifier import Classifier
 from .subsumption import ISubsumptionCriteria
+
 from .exceptions import WrongSubTypeException, OutOfRangeException
 from .selection import IClassifierSelectionStrategy, RouletteWheelSelection
+from .constants import PopulationConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -42,6 +44,7 @@ class ClassifierSet(Generic[SymbolType, ActionType]):
     def insert_classifier(self, __object: Classifier[SymbolType, ActionType], **kwargs) -> None:
         """
         Inserts a classifier into this set.
+
         :param __object: The classifier to be inserted.
         :param kwargs: Key worded arguments.
         :raises:
@@ -80,37 +83,44 @@ class Population(ClassifierSet[SymbolType, ActionType]):
     A population is a set of classifier that represent the knowledge base of a LCS.
     """
 
-    # todo: use settings/params dataclass?
-    def __init__(self, max_size: int,
+    def __init__(self,
+                 max_size: int,
                  subsumption_criteria: ISubsumptionCriteria,
+                 population_constants: PopulationConstants = PopulationConstants(),
                  deletion_selection: IClassifierSelectionStrategy = RouletteWheelSelection(),
                  classifier=[]):
         """
         :param max_size: The maximum size of the population.
+        :param population_constants: Constants used in this population.
         :param subsumption_criteria: Used for determining if a classifier can subsume other classifier.
-        :param deletion_selection: The strategy used for selection classifier to delete from population.
+        :param deletion_selection: The strategy used for selecting classifier to delete from population.
         :raises:
             AssertionError: If the initial collection is greater than the maximum size.
         """
         assert (len(classifier) <= max_size)
         super(Population, self).__init__(classifier)
-        self.deletion_selection = deletion_selection
         self._max_size = max_size
+        self.deletion_selection = deletion_selection
         self.subsumption_criteria = subsumption_criteria
+        self._population_constants: PopulationConstants = population_constants
 
-        self._deletion_exp_threshold = 20
-        self._deletion_fitness_fraction = 0.1
-
-    # todo: docstring?
     def insert_classifier(self, __object: Classifier[SymbolType, ActionType], **kwargs) -> None:
+        """
+        Inserts a classifier into this set.
+
+        :param __object: The classifier to be inserted.
+        :key do_subsumption: Whether to check for subsumption when inserting.
+        :raises:
+            WrongSubTypeException: If __object is not a subtype of Classifier.
+        """
         if not isinstance(__object, Classifier):
             raise WrongSubTypeException(Classifier.__name__, type(__object).__name__)
 
         do_subsumption = kwargs.get('subsumption', False)
 
         # population too big -> deletion necessary
-        if self.numerosity_sum() + __object.numerosity > self._max_size:
-            self.trim_population(desired_size=self._max_size - __object.numerosity)
+        if self.numerosity_sum() + __object.numerosity > self.max_size:
+            self.trim_population(desired_size=self.max_size - __object.numerosity)
 
         # check for same classifier
         for cl in self:
@@ -121,15 +131,24 @@ class Population(ClassifierSet[SymbolType, ActionType]):
         # classifier isn't present, check for subsumption
         if do_subsumption:
             for cl in self:
-                if cl.subsumes(__object) and self._subsumption_criteria.can_subsume(cl):
+                if cl.subsumes(__object) and self.subsumption_criteria.can_subsume(cl):
                     cl.numerosity += __object.numerosity
                     return
 
         # classifier is new, add it
         self._classifier.append(__object)
 
-    # todo: docstring
     def trim_population(self, desired_size: int) -> None:
+        """
+        Reduces the population size to the desired size by deletion. Deletion is done by the strategy
+        set in 'deletion_selection'.
+
+        :param desired_size: The population size to reduce to.
+        :raises:
+            AssertionError: If desired_size > max_size.
+        """
+
+        assert desired_size <= self.max_size
 
         while numerosity_sum := self.numerosity_sum() > desired_size:
             average_fitness = sum([cl.fitness for cl in self]) / numerosity_sum
@@ -137,8 +156,8 @@ class Population(ClassifierSet[SymbolType, ActionType]):
             def deletion_vote(cl: Classifier[SymbolType, ActionType]) -> float:
                 vote = cl.action_set_size * cl.numerosity
 
-                if average_fitness > 0 and cl.fitness > 0 and cl.experience > self._deletion_exp_threshold and (
-                        cl.fitness / cl.numerosity) < self._deletion_fitness_fraction * average_fitness:
+                if average_fitness > 0 and cl.fitness > 0 and cl.experience > self.population_constants.theta_del and (
+                        cl.fitness / cl.numerosity) < self.population_constants.delta * average_fitness:
                     vote *= average_fitness / (cl.fitness / cl.numerosity)
                 return vote
 
@@ -208,12 +227,17 @@ class Population(ClassifierSet[SymbolType, ActionType]):
 
         self._deletion_selection = value
 
+    @property
+    def population_constants(self) -> PopulationConstants:
+        """
+        :return: Constants used in this population.
+        """
+        return self._population_constants
+
 
 class MatchSet(ClassifierSet[SymbolType, ActionType]):
-    # TODO
     pass
 
 
 class ActionSet(ClassifierSet[SymbolType, ActionType]):
-    # TODO
     pass
