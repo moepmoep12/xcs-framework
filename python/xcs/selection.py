@@ -35,8 +35,10 @@ class IClassifierSelectionStrategy(ABC):
         pass
 
 
-# todo: docstring
 class GreedySelection(IClassifierSelectionStrategy):
+    """
+    Simply chooses the classifier with  the highest score.
+    """
 
     @overrides
     def select_classifier(self,
@@ -50,8 +52,10 @@ class GreedySelection(IClassifierSelectionStrategy):
         return max(scores, key=scores.get)
 
 
-# todo: docstring
 class TournamentSelection(IClassifierSelectionStrategy):
+    """
+    Chooses the best classifier from a random selection of classifier.
+    """
 
     def __init__(self, tournament_size: int):
         """
@@ -88,8 +92,11 @@ class TournamentSelection(IClassifierSelectionStrategy):
         return best_index
 
 
-# todo: docstring
 class RouletteWheelSelection(IClassifierSelectionStrategy):
+    """
+    Selection is proportional to score.
+    """
+
     # todo: fix bug with negative values
     @overrides
     def select_classifier(self,

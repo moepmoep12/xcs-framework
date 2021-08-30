@@ -1,10 +1,10 @@
 from typing import TypeVar, Generic
 from numbers import Number
 from math import inf
-from sys import float_info
 
 from .condition import Condition
 from .exceptions import NoneValueException, WrongSubTypeException, OutOfRangeException
+from .constants import ClassifierConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -18,12 +18,24 @@ class Classifier(Generic[SymbolType, ActionType]):
     A classifier represents a rule of the form 'if CONDITION then ACTION'.
     """
 
-    # todo: use dataclass for initial values?
-    def __init__(self, condition: Condition[SymbolType], action: ActionType, **kwargs):
+    def __init__(self,
+                 condition: Condition[SymbolType],
+                 action: ActionType,
+                 cl_constants: ClassifierConstants = ClassifierConstants(),
+                 **kwargs
+                 ):
         """
+        Key worded arguments override values specified in cl_constants.
+
         :param condition: The condition under which this classifier is active.
         :param action: The action to execute if this classifier is active.
-        :param kwargs: Key worded arguments.
+        :param cl_constants: Classifier constants.
+        :key f: Custom initial fitness.
+        :key exp: Custom initial experience.
+        :key n: Custom initial numerosity.
+        :key a: Custom initial action set size.
+        :key p: Custom initial prediction.
+        :key e: Custom initial epsilon.
         :raises:
             NoneValueException: If any of the required arguments is None.
             WrongSubTypeException: If the condition is not of type Condition.
@@ -37,12 +49,15 @@ class Classifier(Generic[SymbolType, ActionType]):
 
         self._condition: Condition[SymbolType] = condition
         self._action: ActionType = action
+        self._classifier_constants: ClassifierConstants = cl_constants
+
         self._experience: int = kwargs.get('exp', 0)
-        self._fitness: float = kwargs.get('f', float_info.epsilon)
         self._numerosity: int = kwargs.get('n', 1)
-        self._prediction: float = kwargs.get('p', float_info.epsilon)
-        self._epsilon: float = kwargs.get('e', float_info.epsilon)
         self._action_set_size: float = kwargs.get('a', 1)
+
+        self._fitness: float = kwargs.get('f', cl_constants.fitness_init)
+        self._prediction: float = kwargs.get('p', cl_constants.prediction_init)
+        self._epsilon: float = kwargs.get('e', cl_constants.epsilon_init)
 
     @property
     def condition(self) -> Condition[SymbolType]:
@@ -163,7 +178,6 @@ class Classifier(Generic[SymbolType, ActionType]):
         self._experience += 1
 
     def subsumes(self, other) -> bool:
-        # TODO: Exceptions?
         """
         Checks whether this classifier could subsume other.
 

@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from overrides import overrides
-
-from .exceptions import WrongSubTypeException, OutOfRangeException
 from numbers import Number
 from math import inf
+
+from .exceptions import WrongSubTypeException, OutOfRangeException
 
 
 class ISubsumptionCriteria(ABC):
