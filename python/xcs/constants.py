@@ -82,7 +82,7 @@ class XCSConstants:
             raise WrongStrictTypeException(bool.__name__, type(value).__name__)
 
         self._do_learning_subsumption = value
-        
+
     @property
     def do_discovery_subsumption(self):
         """
@@ -101,6 +101,32 @@ class XCSConstants:
             raise WrongStrictTypeException(bool.__name__, type(value).__name__)
 
         self._do_discovery_subsumption = value
+
+
+class SymbolConstants:
+    """
+    Constants regarding Symbols. A Symbol encapsulates a value and can match to other values.
+    """
+
+    class SymbolRepresentation(Enum):
+        """
+        Representation of symbols.
+        NORMAL: Use simple symbols that have a single value. A match occurs if the values are equal.
+        CENTER_SPREAD: Use bound symbols with a lower and upper value. Those are defined by a center and a spread.
+                       A match occurs if the given value is within the bounds.
+        """
+        NORMAL = 1
+        CENTER_SPREAD = 2
+
+    def __init__(self, symbol_repr: SymbolRepresentation = SymbolRepresentation.NORMAL):
+        self._symbol_repr = symbol_repr
+
+    @property
+    def symbol_representation(self) -> SymbolRepresentation:
+        """
+        :return: Representation of symbols.
+        """
+        return self._symbol_repr
 
 
 class ClassifierConstants:
