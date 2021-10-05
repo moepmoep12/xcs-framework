@@ -149,6 +149,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
         for cl in classifier_set:
             # handle classifier that were created outside of this GA
             if not getattr(cl, TIMESTAMP, False):
+                # decorating timestamp attribute
                 setattr(cl, TIMESTAMP, timestamp)
             average_timestamp += getattr(cl, TIMESTAMP) / numerosity_sum * cl.numerosity
 
@@ -170,6 +171,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
         child.fitness = parent.fitness / parent.numerosity
         child.prediction = parent.prediction
         child.epsilon = parent.epsilon
+        # decorating timestamp attribute
         setattr(child, TIMESTAMP, timestamp)
         return child
 
@@ -201,13 +203,13 @@ class GeneticAlgorithm(IDiscoveryComponent):
         """
         Performs the crossover operation on two classifier.
         """
-        performed_crossover = False
+        did_crossover = False
 
         if random.random() < self.ga_constants.crossover_probability:
             crossover_method = self._crossover_methods[self.ga_constants.crossover_method]
-            performed_crossover = crossover_method(cl1, cl2)
+            did_crossover = crossover_method(cl1, cl2)
 
-        if performed_crossover:
+        if did_crossover:
             cl1.prediction = cl2.prediction = (cl1.prediction + cl2.prediction) / 2
             cl1.epsilon = cl2.epsilon = (cl1.epsilon + cl2.epsilon) / 2
             cl1.fitness = cl2.fitness = (cl1.fitness + cl2.fitness) / 2

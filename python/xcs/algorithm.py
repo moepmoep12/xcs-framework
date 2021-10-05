@@ -29,8 +29,8 @@ class XcsState(Generic[SymbolType, ActionType]):
 
 class XCS(Generic[SymbolType, ActionType]):
     """
-    A basic component based implementation of eXtended Learning Classifier System.
-    Inspiration taken from the paper 'An algorithmic description of XCS' by Butz & Wilson 2000
+    A basic component based implementation of an eXtended Learning Classifier System.
+    Inspired by the paper 'An algorithmic description of XCS' by Butz & Wilson 2000
     (https://doi.org/10.1007/s005000100111).
     """
 

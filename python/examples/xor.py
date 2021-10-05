@@ -9,7 +9,7 @@ from xcs.classifier_sets import Population
 from xcs.algorithm import XCS
 
 """
-A simple example where the XCS shall learn some form of XOR (exclusive or). This is a single step problem. 
+A simple example where the XCS shall learn the XOR function (exclusive or). This is a single step problem. 
 Given an input [n_0, ..., n_n] the output should be 1 if n_0 == 1 AND n_n == 0 OR n_0 == 0 AND n_n == 1.
 The symbols between n_0 to n_n make the problem harder and should be ignored by the XCS.
 Therefore a maximum general classifier could look like: [1 #....# 0 ] : 1.
@@ -46,7 +46,7 @@ def print_population(population):
 # the length of the input. larger inputs lead to increased runtime and complexity
 INPUT_LENGTH = 5
 
-# how many learning iterations will be run
+# how many learning iterations will be done
 ITERATIONS = 10000
 
 # the reward received for correct classification
