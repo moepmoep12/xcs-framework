@@ -4,13 +4,13 @@ from overrides import overrides
 import copy
 import random
 
-from xcs.classifier_sets import ClassifierSet
-from xcs.state import State
-from xcs.classifier import Classifier
-from xcs.condition import Condition
-from xcs.symbol import WildcardSymbol, ISymbol, SYMBOL_CONSTRUCTORS
-from xcs.exceptions import EmptyCollectionException
-from xcs.constants import CoveringConstants, SymbolConstants
+from xcs_framework.xcs.classifier_sets import ClassifierSet
+from xcs_framework.xcs.state import State
+from xcs_framework.xcs.classifier import Classifier
+from xcs_framework.xcs.condition import Condition
+from xcs_framework.xcs.symbol import WildcardSymbol, ISymbol, Symbol
+from xcs_framework.xcs.exceptions import EmptyCollectionException
+from xcs_framework.xcs.constants import CoveringConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -44,14 +44,11 @@ class CoveringComponent(ICoveringComponent):
     Basic CoveringComponent.
     """
 
-    def __init__(self, covering_constants: CoveringConstants = CoveringConstants(),
-                 symbol_constants: SymbolConstants = SymbolConstants()):
+    def __init__(self, covering_constants: CoveringConstants = CoveringConstants()):
         """
         :param covering_constants: Constants used in this component.
-        :param symbol_constants: Constants for symbols.
         """
         self._covering_constants: CoveringConstants = covering_constants
-        self._symbol_constants: SymbolConstants = symbol_constants
 
     @overrides
     def covering_operation(self,
@@ -82,7 +79,7 @@ class CoveringComponent(ICoveringComponent):
                 if random.random() < self.covering_constants.wildcard_probability:
                     condition_symbols[i] = WildcardSymbol()
                 else:
-                    condition_symbols[i] = self._create_symbol(copy.deepcopy(current_state[i])) #Symbol(copy.deepcopy(current_state[i]))
+                    condition_symbols[i] = self._create_symbol(current_state[i])
 
             cl = Classifier(condition=Condition(condition_symbols), action=action)
             result.insert_classifier(cl)
@@ -96,5 +93,11 @@ class CoveringComponent(ICoveringComponent):
         """
         return self._covering_constants
 
-    def _create_symbol(self, symbol_value: SymbolType) -> ISymbol[SymbolType]:
-        return SYMBOL_CONSTRUCTORS[self._symbol_constants.symbol_representation](symbol_value)
+    def _create_symbol(self, value: SymbolType) -> ISymbol[SymbolType]:
+        """
+        Factory method for symbol creation.
+        :param value: The value for the symbol. Can be a ref!
+        :return: Newly created symbol.
+        """
+        # because value can be a ref, we make a deep copy
+        return Symbol(copy.deepcopy(value))

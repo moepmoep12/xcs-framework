@@ -188,7 +188,7 @@ class Classifier(Generic[SymbolType, ActionType]):
             getattr(other, 'condition', None))
 
     def __repr__(self):
-        return f"{str(self.condition)} : {self.action}, " \
+        return f"{str(self.condition)} --> {self.action}, " \
                f"F:{self.fitness:.3f}, " \
                f"P:{self.prediction:.3f}, " \
                f"E:{self.epsilon:.3f}, " \

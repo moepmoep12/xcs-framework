@@ -2,8 +2,8 @@ from abc import abstractmethod, ABC
 from overrides import overrides
 from typing import TypeVar
 
-from xcs.classifier_sets import ClassifierSet
-from xcs.constants import LearningConstants, FitnessConstants
+from xcs_framework.xcs.classifier_sets import ClassifierSet
+from xcs_framework.xcs.constants import LearningConstants, FitnessConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')

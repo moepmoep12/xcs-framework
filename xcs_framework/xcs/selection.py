@@ -4,8 +4,8 @@ from overrides import overrides
 from sys import maxsize as max_int
 import random
 
-from xcs.classifier import Classifier
-from xcs.exceptions import OutOfRangeException, WrongStrictTypeException
+from .classifier import Classifier
+from .exceptions import OutOfRangeException, WrongStrictTypeException
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')

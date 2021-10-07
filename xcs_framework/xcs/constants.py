@@ -3,7 +3,7 @@ from math import inf
 from sys import float_info
 from enum import Enum
 
-from xcs.exceptions import OutOfRangeException, WrongStrictTypeException
+from .exceptions import OutOfRangeException, WrongStrictTypeException
 
 """
 The constants (hyper parameters), their names and default values are based upon the paper

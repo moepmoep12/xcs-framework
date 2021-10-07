@@ -1,12 +1,12 @@
 from typing import TypeVar, Generic, List
 from dataclasses import dataclass
 
-from xcs.components.performance import ChosenAction
-from xcs.state import State
-from xcs.classifier_sets import Population, ActionSet
-from xcs.components import *
-from xcs.exceptions import *
-from xcs.constants import XCSConstants
+from .components.performance import ChosenAction
+from .state import State
+from .classifier_sets import Population, ActionSet
+from .components import *
+from .exceptions import *
+from .constants import XCSConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -224,7 +224,7 @@ class XCS(Generic[SymbolType, ActionType]):
             WrongSubTypeException: If value is not a subtype of IDiscoveryComponent.
         """
         if not isinstance(value, IDiscoveryComponent):
-            raise ValueError(f"{value} is not of type {type(IDiscoveryComponent)}")
+            raise WrongSubTypeException(IDiscoveryComponent.__name__, type(value).__name__)
 
         self._discovery_component = value
 
@@ -243,6 +243,6 @@ class XCS(Generic[SymbolType, ActionType]):
             WrongSubTypeException: If value is not a subtype of ILearningComponent.
         """
         if not isinstance(value, ILearningComponent):
-            raise ValueError(f"{value} is not of type {type(ILearningComponent)}")
+            raise WrongSubTypeException(ILearningComponent.__name__, type(value).__name__)
 
         self._learning_component = value

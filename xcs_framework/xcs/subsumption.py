@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from overrides import overrides
 from numbers import Number
 from math import inf
+from sys import float_info
 
 from .exceptions import WrongSubTypeException, OutOfRangeException
 
@@ -27,7 +28,7 @@ class SubsumptionCriteriaExperiencePrecision(ISubsumptionCriteria):
     A classifier can subsume other classifier if it has enough experience and is precise enough.
     """
 
-    def __init__(self, min_exp: int, max_epsilon: float):
+    def __init__(self, min_exp: int = 25, max_epsilon: float = float_info.epsilon):
         """
         :param min_exp: Minimum experience of a classifier required to be able to subsume other classifier.
         :param max_epsilon: The error threshold under which a classifier is considered precise enough in its prediction.
@@ -79,7 +80,7 @@ class SubsumptionCriteriaExperiencePrecision(ISubsumptionCriteria):
         raises: 
             WrongSubTypeException: If classifier is not a Classifier.
         """
-        from xcs.classifier import Classifier
+        from .classifier import Classifier
         if not isinstance(classifier, Classifier):
             raise WrongSubTypeException(Classifier.__name__, type(classifier).__name__)
 

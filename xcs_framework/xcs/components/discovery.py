@@ -4,14 +4,14 @@ from typing import TypeVar, Collection, Set
 import copy
 import random
 
-from xcs.classifier import Classifier
-from xcs.classifier_sets import ClassifierSet
-from xcs.symbol import WildcardSymbol, Symbol
-from xcs.condition import Condition
-from xcs.state import State
-from xcs.selection import IClassifierSelectionStrategy, RouletteWheelSelection
-from xcs.exceptions import *
-from xcs.constants import GAConstants
+from xcs_framework.xcs.classifier import Classifier
+from xcs_framework.xcs.classifier_sets import ClassifierSet
+from xcs_framework.xcs.symbol import WildcardSymbol, Symbol
+from xcs_framework.xcs.condition import Condition
+from xcs_framework.xcs.state import State
+from xcs_framework.xcs.selection import IClassifierSelectionStrategy, RouletteWheelSelection
+from xcs_framework.xcs.exceptions import *
+from xcs_framework.xcs.constants import GAConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')
@@ -185,6 +185,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
     def _mutate(self, classifier: Classifier[SymbolType, ActionType], state: State[SymbolType]):
         """
         Mutates a classifier by changing some of its condition symbols and the action if enabled.
+        Turns non-wildcard symbols into wildcards and vice versa.
         """
         for i in range(len(classifier.condition)):
             if random.random() < self.ga_constants.mutation_rate:
@@ -194,10 +195,10 @@ class GeneticAlgorithm(IDiscoveryComponent):
                     classifier.condition[i] = WildcardSymbol()
 
         if self.ga_constants.mutate_action:
-            actions = set(self.available_actions)
+            actions = list(set(self._available_actions))
             actions.remove(classifier.action)
             if len(actions) > 0:
-                classifier.action = actions[random.randint(0, len(actions) - 1)]
+                classifier._action = actions[random.randint(0, len(actions) - 1)]
 
     def _crossover(self, cl1: Classifier[SymbolType, ActionType], cl2: Classifier[SymbolType, ActionType]):
         """
