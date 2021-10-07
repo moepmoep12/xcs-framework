@@ -11,7 +11,7 @@ setup(
     description='A framework for the eXtended Classifier System (XCS) in Python',
     author='Andreas Schmidt',
     author_email='moepmoep12@gmail.com',
-    packages=["xcs"],
+    packages=["xcs", "xcsr"],
     include_package_data=True,
-    install_requires=["overrides"]
+    install_requires=["overrides", "numpy"]
 )
