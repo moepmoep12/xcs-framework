@@ -1,6 +1,6 @@
-from xcs.subsumption import ISubsumptionCriteria
-from xcs.selection import IClassifierSelectionStrategy
-from xcs.components.covering import ICoveringComponent, SymbolType, ActionType
+from xcs_framework.xcs.subsumption import ISubsumptionCriteria
+from xcs_framework.xcs.selection import IClassifierSelectionStrategy
+from xcs_framework.xcs.components.covering import ICoveringComponent, SymbolType, ActionType
 
 
 class SubsumptionStub(ISubsumptionCriteria):

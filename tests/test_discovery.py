@@ -4,11 +4,11 @@ from unittest import TestCase
 class TestGeneticAlgorithm(TestCase):
 
     def test__generate_child(self):
-        from xcs.condition import Condition
-        from xcs.symbol import Symbol, WildcardSymbol
-        from xcs.classifier import Classifier
-        from xcs.components.discovery import GeneticAlgorithm, TIMESTAMP
-        from tests.stubs import SelectionStub
+        from xcs_framework.xcs.condition import Condition
+        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcs_framework.xcs.classifier import Classifier
+        from xcs_framework.xcs.components.discovery import GeneticAlgorithm, TIMESTAMP
+        from .stubs import SelectionStub
         ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         condition: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         action: int = 1
@@ -33,12 +33,12 @@ class TestGeneticAlgorithm(TestCase):
         self.assertNotEqual(getattr(parent, TIMESTAMP), getattr(child, TIMESTAMP))
 
     def test__should_run(self):
-        from xcs.condition import Condition
-        from xcs.symbol import Symbol, WildcardSymbol
-        from xcs.classifier import Classifier
-        from xcs.components.discovery import GeneticAlgorithm, TIMESTAMP
-        from xcs.classifier_sets import ActionSet
-        from tests.stubs import SelectionStub
+        from xcs_framework.xcs.condition import Condition
+        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcs_framework.xcs.classifier import Classifier
+        from xcs_framework.xcs.components.discovery import GeneticAlgorithm, TIMESTAMP
+        from xcs_framework.xcs.classifier_sets import ActionSet
+        from .stubs import SelectionStub
         ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         ga.ga_constants.ga_threshold = 5
         condition: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
@@ -57,10 +57,10 @@ class TestGeneticAlgorithm(TestCase):
         self.assertTrue(ga._should_run(timestamp, ActionSet([cl2, cl1, cl3])))
 
     def test__swap_symbols_one_element(self):
-        from xcs.condition import Condition
-        from xcs.symbol import Symbol, WildcardSymbol
-        from xcs.components.discovery import GeneticAlgorithm
-        from tests.stubs import SelectionStub
+        from xcs_framework.xcs.condition import Condition
+        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcs_framework.xcs.components.discovery import GeneticAlgorithm
+        from .stubs import SelectionStub
         import copy
         ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         symbols1 = [Symbol('1'), WildcardSymbol(), Symbol('1')]
@@ -82,10 +82,10 @@ class TestGeneticAlgorithm(TestCase):
                     self.assertEqual(condition2[j], symbols1[j])
 
     def test_swap_symbols_multiple_elements(self):
-        from xcs.condition import Condition
-        from xcs.symbol import Symbol, WildcardSymbol
-        from xcs.components.discovery import GeneticAlgorithm
-        from tests.stubs import SelectionStub
+        from xcs_framework.xcs.condition import Condition
+        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcs_framework.xcs.components.discovery import GeneticAlgorithm
+        from .stubs import SelectionStub
         import copy
         ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         symbols1 = [Symbol('1'), WildcardSymbol(), Symbol('1')]
@@ -103,11 +103,11 @@ class TestGeneticAlgorithm(TestCase):
             self.assertEqual(condition2[i], symbols1[i])
 
     def test__swap_symbols_exception(self):
-        from xcs.condition import Condition
-        from xcs.symbol import Symbol, WildcardSymbol
-        from xcs.components.discovery import GeneticAlgorithm
-        from xcs.exceptions import NoneValueException, EmptyCollectionException, OutOfRangeException
-        from tests.stubs import SelectionStub
+        from xcs_framework.xcs.condition import Condition
+        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcs_framework.xcs.components.discovery import GeneticAlgorithm
+        from xcs_framework.xcs.exceptions import NoneValueException, EmptyCollectionException, OutOfRangeException
+        from .stubs import SelectionStub
         import copy
         ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
         symbols1 = [Symbol('1'), WildcardSymbol(), Symbol('1')]
@@ -150,10 +150,10 @@ class TestGeneticAlgorithm(TestCase):
             ga._swap_symbols(condition1, condition3, 2, 1)
 
     def test_selection_strategy_setter(self):
-        from xcs.components.discovery import GeneticAlgorithm
-        from tests.stubs import SelectionStub
+        from xcs_framework.xcs.components.discovery import GeneticAlgorithm
+        from .stubs import SelectionStub
         ga = GeneticAlgorithm(selection_strategy=SelectionStub(), available_actions=[0])
-        from xcs.exceptions import WrongSubTypeException
+        from xcs_framework.xcs.exceptions import WrongSubTypeException
 
         with self.assertRaises(WrongSubTypeException):
             ga.selection_strategy = 0

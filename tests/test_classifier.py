@@ -4,8 +4,8 @@ from unittest import TestCase
 class TestClassifier(TestCase):
 
     def test_init(self):
-        from xcs.classifier import Classifier
-        from xcs.exceptions import NoneValueException, WrongSubTypeException
+        from xcs_framework.xcs.classifier import Classifier
+        from xcs_framework.xcs.exceptions import NoneValueException, WrongSubTypeException
 
         with self.assertRaises(NoneValueException):
             Classifier(None, 1)
@@ -14,9 +14,9 @@ class TestClassifier(TestCase):
             Classifier('a', 1)
 
     def test_deep_copy(self):
-        from xcs.classifier import Classifier
-        from xcs.condition import Condition
-        from xcs.symbol import Symbol, WildcardSymbol
+        from xcs_framework.xcs.classifier import Classifier
+        from xcs_framework.xcs.condition import Condition
+        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
         import copy
 
         condition = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
@@ -33,9 +33,9 @@ class TestClassifier(TestCase):
         self.assertTrue(original.epsilon != clone.epsilon)
 
     def test_subsumes(self):
-        from xcs.classifier import Classifier
-        from xcs.condition import Condition
-        from xcs.symbol import Symbol, WildcardSymbol
+        from xcs_framework.xcs.classifier import Classifier
+        from xcs_framework.xcs.condition import Condition
+        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
 
         condition1 = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         condition2 = Condition([Symbol('1'), Symbol('2'), Symbol('1')])

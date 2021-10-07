@@ -7,8 +7,8 @@ val_i: int = 42
 class TestSymbol(TestCase):
 
     def test_init_symbol(self):
-        from xcs.symbol import Symbol
-        from xcs.exceptions import NoneValueException
+        from xcs_framework.xcs.symbol import Symbol
+        from xcs_framework.xcs.exceptions import NoneValueException
 
         with self.assertRaises(NoneValueException):
             Symbol(None)
@@ -20,14 +20,14 @@ class TestSymbol(TestCase):
         self.assertEqual(val_i, s2.value)
 
     def test_matches_symbol(self):
-        from xcs.symbol import Symbol
+        from xcs_framework.xcs.symbol import Symbol
         s1 = Symbol(val_str)
 
         self.assertTrue(s1.matches(val_str))
         self.assertFalse(s1.matches(val_i))
 
     def test_equals(self):
-        from xcs.symbol import Symbol, WildcardSymbol, ISymbol, WILDCARD_CHAR
+        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol, ISymbol, WILDCARD_CHAR
         s1: ISymbol = Symbol(val_str)
         s2: ISymbol = Symbol(val_str)
         s3: ISymbol = Symbol(val_i)
@@ -44,7 +44,7 @@ class TestSymbol(TestCase):
 
 class TestWildcardSymbol(TestCase):
     def test_matches(self):
-        from xcs.symbol import WildcardSymbol
+        from xcs_framework.xcs.symbol import WildcardSymbol
         w = WildcardSymbol()
 
         self.assertTrue(w.matches(val_str))
@@ -54,8 +54,8 @@ class TestWildcardSymbol(TestCase):
 class TestCenterSpreadSymbol(TestCase):
 
     def test_init(self):
-        from xcs.symbol import CenterSpreadSymbol
-        from xcs.exceptions import NoneValueException, OutOfRangeException
+        from xcs_framework.xcsr.center_spread.cs_symbol import CenterSpreadSymbol
+        from xcs_framework.xcs.exceptions import NoneValueException, OutOfRangeException
 
         with self.assertRaises(NoneValueException):
             CenterSpreadSymbol(center=None, spread=1)
@@ -74,7 +74,7 @@ class TestCenterSpreadSymbol(TestCase):
         self.assertEqual(center + spread, s1.upper_value)
 
     def test_matches(self):
-        from xcs.symbol import CenterSpreadSymbol
+        from xcs_framework.xcsr.center_spread.cs_symbol import CenterSpreadSymbol
         s1 = CenterSpreadSymbol(center=val_i, spread=val_i)
 
         self.assertTrue(s1.matches(val_i - val_i))
@@ -83,7 +83,8 @@ class TestCenterSpreadSymbol(TestCase):
         self.assertFalse(s1.matches(val_i - val_i - 1))
 
     def test_equals(self):
-        from xcs.symbol import Symbol, WildcardSymbol, CenterSpreadSymbol, ISymbol, WILDCARD_CHAR
+        from xcs_framework.xcsr.center_spread.cs_symbol import CenterSpreadSymbol
+        from xcs_framework.xcs.symbol import ISymbol, Symbol, WildcardSymbol, WILDCARD_CHAR
         s1: ISymbol = CenterSpreadSymbol(center=val_i, spread=val_i)
         s2: ISymbol = CenterSpreadSymbol(center=val_i, spread=val_i)
         s3: ISymbol = Symbol(val_i)
