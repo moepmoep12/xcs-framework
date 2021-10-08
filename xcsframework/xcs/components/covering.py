@@ -4,13 +4,13 @@ from overrides import overrides
 import copy
 import random
 
-from xcs_framework.xcs.classifier_sets import ClassifierSet
-from xcs_framework.xcs.state import State
-from xcs_framework.xcs.classifier import Classifier
-from xcs_framework.xcs.condition import Condition
-from xcs_framework.xcs.symbol import WildcardSymbol, ISymbol, Symbol
-from xcs_framework.xcs.exceptions import EmptyCollectionException
-from xcs_framework.xcs.constants import CoveringConstants
+from xcsframework.xcs.classifier_sets import ClassifierSet
+from xcsframework.xcs.state import State
+from xcsframework.xcs.classifier import Classifier
+from xcsframework.xcs.condition import Condition
+from xcsframework.xcs.symbol import WildcardSymbol, ISymbol, Symbol
+from xcsframework.xcs.exceptions import EmptyCollectionException
+from xcsframework.xcs.constants import CoveringConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')

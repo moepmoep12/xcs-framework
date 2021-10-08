@@ -11,8 +11,8 @@ import random
 import sys
 from typing import List
 
-from xcs_framework.xcs import *
-from xcs_framework.training import *
+from xcsframework.xcs import *
+from xcsframework.training import *
 
 
 class MultiplexerEnvironment(IEnvironment):

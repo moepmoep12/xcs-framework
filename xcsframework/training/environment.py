@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 from typing import TypeVar, List
 from numbers import Number
 
-from xcs_framework.xcs.state import State
+from xcsframework.xcs.state import State
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')

@@ -1,8 +1,8 @@
 from math import inf
 from numbers import Number
 
-from xcs_framework.xcs.constants import CoveringConstants, GAConstants
-from xcs_framework.xcs.exceptions import OutOfRangeException, WrongStrictTypeException
+from xcsframework.xcs.constants import CoveringConstants, GAConstants
+from xcsframework.xcs.exceptions import OutOfRangeException, WrongStrictTypeException
 
 
 class XCSRCoveringConstants(CoveringConstants):

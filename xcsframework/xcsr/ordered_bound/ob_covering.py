@@ -3,12 +3,12 @@ import random
 from overrides import overrides
 from numbers import Number
 
-from xcs_framework.xcs.components.covering import CoveringComponent, SymbolType
-from xcs_framework.xcs.symbol import ISymbol
-from xcs_framework.xcs.exceptions import WrongSubTypeException
+from xcsframework.xcs.components.covering import CoveringComponent, SymbolType
+from xcsframework.xcs.symbol import ISymbol
+from xcsframework.xcs.exceptions import WrongSubTypeException
 
-from xcs_framework.xcsr.constants import XCSRCoveringConstants
-from xcs_framework.xcsr.ordered_bound.ob_symbol import OrderedBoundSymbol
+from xcsframework.xcsr.constants import XCSRCoveringConstants
+from xcsframework.xcsr.ordered_bound.ob_symbol import OrderedBoundSymbol
 
 
 class OBCoveringComponent(CoveringComponent):

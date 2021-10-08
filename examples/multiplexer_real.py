@@ -12,10 +12,10 @@ where offset = 2 because we use two bits for the address.
 import random
 from typing import List
 
-from xcs_framework.xcs import *
-from xcs_framework.training import *
+from xcsframework.xcs import *
+from xcsframework.training import *
 
-from xcs_framework.xcsr import *
+from xcsframework.xcsr import *
 
 
 class MultiplexerRealEnvironment(IEnvironment):

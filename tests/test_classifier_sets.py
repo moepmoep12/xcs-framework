@@ -3,10 +3,10 @@ from unittest import TestCase
 
 class TestClassifierSet(TestCase):
     def test_classifier_set(self):
-        from xcs_framework.xcs.classifier_sets import ClassifierSet
-        from xcs_framework.xcs.classifier import Classifier
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcsframework.xcs.classifier_sets import ClassifierSet
+        from xcsframework.xcs.classifier import Classifier
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol, WildcardSymbol
 
         cond1: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         cond2: Condition[str] = Condition([Symbol('0'), WildcardSymbol(), Symbol('1')])
@@ -28,10 +28,10 @@ class TestClassifierSet(TestCase):
         self.assertTrue(available_actions == set([1, 0]))
 
     def test_remove_classifier(self):
-        from xcs_framework.xcs.classifier_sets import ClassifierSet
-        from xcs_framework.xcs.classifier import Classifier
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcsframework.xcs.classifier_sets import ClassifierSet
+        from xcsframework.xcs.classifier import Classifier
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol, WildcardSymbol
 
         cond1: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         cond2: Condition[str] = Condition([Symbol('0'), WildcardSymbol(), Symbol('1')])
@@ -55,11 +55,11 @@ class TestClassifierSet(TestCase):
 class TestPopulation(TestCase):
 
     def test_create_population(self):
-        from xcs_framework.xcs.classifier_sets import Population
-        from xcs_framework.xcs.classifier import Classifier
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import WildcardSymbol, Symbol
-        from .stubs import SubsumptionStub
+        from xcsframework.xcs.classifier_sets import Population
+        from xcsframework.xcs.classifier import Classifier
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import WildcardSymbol, Symbol
+        from tests.stubs import SubsumptionStub
 
         cond1 = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         cond2 = Condition([Symbol('0'), WildcardSymbol(), Symbol('1')])
@@ -80,11 +80,11 @@ class TestPopulation(TestCase):
         self.assertTrue(population[2] == cl3)
 
     def test_trim_population(self):
-        from xcs_framework.xcs.classifier_sets import Population
-        from xcs_framework.xcs.classifier import Classifier
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import WildcardSymbol, Symbol
-        from .stubs import SubsumptionStub
+        from xcsframework.xcs.classifier_sets import Population
+        from xcsframework.xcs.classifier import Classifier
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import WildcardSymbol, Symbol
+        from tests.stubs import SubsumptionStub
 
         cond1 = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
         cond2 = Condition([Symbol('0'), WildcardSymbol(), Symbol('1')])

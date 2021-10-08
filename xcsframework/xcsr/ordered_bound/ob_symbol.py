@@ -1,8 +1,8 @@
 from numbers import Number
 
-from xcs_framework.xcs.exceptions import NoneValueException, WrongSubTypeException
+from xcsframework.xcs.exceptions import NoneValueException, WrongSubTypeException
 
-from xcs_framework.xcsr.bound_symbol import BoundSymbol
+from xcsframework.xcsr.bound_symbol import BoundSymbol
 
 
 class OrderedBoundSymbol(BoundSymbol):

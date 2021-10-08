@@ -8,8 +8,8 @@ Therefore a maximum general classifier could look like: [1 #....# 0 ] : 1.
 import random
 from typing import List
 
-from xcs_framework.xcs import *
-from xcs_framework.training import *
+from xcsframework.xcs import *
+from xcsframework.training import *
 
 
 class XOREnvironment(IEnvironment):

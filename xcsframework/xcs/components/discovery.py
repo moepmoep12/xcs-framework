@@ -4,14 +4,14 @@ from typing import TypeVar, Collection, Set
 import copy
 import random
 
-from xcs_framework.xcs.classifier import Classifier
-from xcs_framework.xcs.classifier_sets import ClassifierSet
-from xcs_framework.xcs.symbol import WildcardSymbol, Symbol
-from xcs_framework.xcs.condition import Condition
-from xcs_framework.xcs.state import State
-from xcs_framework.xcs.selection import IClassifierSelectionStrategy, RouletteWheelSelection
-from xcs_framework.xcs.exceptions import *
-from xcs_framework.xcs.constants import GAConstants
+from xcsframework.xcs.classifier import Classifier
+from xcsframework.xcs.classifier_sets import ClassifierSet
+from xcsframework.xcs.symbol import WildcardSymbol, Symbol
+from xcsframework.xcs.condition import Condition
+from xcsframework.xcs.state import State
+from xcsframework.xcs.selection import IClassifierSelectionStrategy, RouletteWheelSelection
+from xcsframework.xcs.exceptions import *
+from xcsframework.xcs.constants import GAConstants
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')

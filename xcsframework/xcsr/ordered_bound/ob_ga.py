@@ -2,12 +2,12 @@ import random
 from overrides import overrides
 from typing import Collection
 
-from xcs_framework.xcs.components.discovery import GeneticAlgorithm, SymbolType, ActionType
-from xcs_framework.xcs.selection import IClassifierSelectionStrategy, RouletteWheelSelection
-from xcs_framework.xcs.classifier import Classifier
-from xcs_framework.xcs.state import State
+from xcsframework.xcs.components.discovery import GeneticAlgorithm, SymbolType, ActionType
+from xcsframework.xcs.selection import IClassifierSelectionStrategy, RouletteWheelSelection
+from xcsframework.xcs.classifier import Classifier
+from xcsframework.xcs.state import State
 
-from xcs_framework.xcsr.constants import XCSRGAConstants
+from xcsframework.xcsr.constants import XCSRGAConstants
 
 
 class OBGeneticAlgorithm(GeneticAlgorithm):

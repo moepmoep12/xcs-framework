@@ -4,8 +4,8 @@ import sys
 from typing import TypeVar, Generic
 from dataclasses import dataclass
 
-from xcs_framework.xcs.algorithm import XCS
-from xcs_framework.xcs.state import State
+from xcsframework.xcs.algorithm import XCS
+from xcsframework.xcs.state import State
 from .metrics import Metric
 from .environment import IEnvironment
 

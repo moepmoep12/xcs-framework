@@ -3,9 +3,9 @@ from unittest import TestCase
 
 class TestCondition(TestCase):
     def test_init(self):
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol
-        from xcs_framework.xcs.exceptions import EmptyCollectionException, WrongSubTypeException
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol
+        from xcsframework.xcs.exceptions import EmptyCollectionException, WrongSubTypeException
 
         with self.assertRaises(EmptyCollectionException):
             Condition(None)
@@ -17,9 +17,9 @@ class TestCondition(TestCase):
             Condition([Symbol('1'), 'A'])
 
     def test_matches(self):
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
-        from xcs_framework.xcs.state import State
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol, WildcardSymbol
+        from xcsframework.xcs.state import State
         state = State(['1', '0', '1'])
         c1: Condition[str] = Condition([Symbol('1'), Symbol('0'), Symbol('1')])
         c2: Condition[str] = Condition([Symbol('1'), WildcardSymbol(), Symbol('1')])
@@ -31,8 +31,8 @@ class TestCondition(TestCase):
         self.assertFalse(c4.matches(state))
 
     def test_len(self):
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol, WildcardSymbol
         situation = ['1', '0', '1']
         c1: Condition = Condition([Symbol('1'), Symbol('0'), Symbol('1')])
         c2: Condition = Condition([WildcardSymbol(), WildcardSymbol(), WildcardSymbol()])
@@ -40,8 +40,8 @@ class TestCondition(TestCase):
         self.assertEqual(len(c2), len(situation))
 
     def test_equal(self):
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol, WildcardSymbol
         c1: Condition = Condition([Symbol('1'), Symbol('0'), Symbol('1')])
         c2: Condition = Condition([Symbol('1'), Symbol('0'), Symbol('1')])
         c3: Condition = Condition([WildcardSymbol(), Symbol('0'), Symbol('1')])
@@ -51,8 +51,8 @@ class TestCondition(TestCase):
         self.assertFalse(c1 == c4)
 
     def test_is_more_general(self):
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol, WildcardSymbol
         c1: Condition = Condition([Symbol('1'), Symbol('0'), Symbol('1')])
         c2: Condition = Condition([WildcardSymbol(), Symbol('0'), Symbol('1')])
         c3: Condition = Condition([Symbol('1'), Symbol('0'), WildcardSymbol()])
@@ -69,9 +69,9 @@ class TestCondition(TestCase):
             c4.is_more_general(c1)
 
     def test_get_item(self):
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol
-        from xcs_framework.xcs.exceptions import OutOfRangeException, WrongStrictTypeException
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol
+        from xcsframework.xcs.exceptions import OutOfRangeException, WrongStrictTypeException
         symbol = Symbol('1')
         c: Condition = Condition([symbol, Symbol('0'), Symbol('1')])
 
@@ -84,9 +84,9 @@ class TestCondition(TestCase):
             c['a']
 
     def test_set_item(self):
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
-        from xcs_framework.xcs.exceptions import OutOfRangeException, WrongStrictTypeException, WrongSubTypeException
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol, WildcardSymbol
+        from xcsframework.xcs.exceptions import OutOfRangeException, WrongStrictTypeException, WrongSubTypeException
         c: Condition = Condition([Symbol('1'), Symbol('0'), Symbol('1')])
         c[0] = WildcardSymbol()
 

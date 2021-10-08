@@ -1,9 +1,9 @@
 from numbers import Number
 from math import inf
 
-from xcs_framework.xcs.exceptions import NoneValueException, OutOfRangeException
+from xcsframework.xcs.exceptions import NoneValueException, OutOfRangeException
 
-from xcs_framework.xcsr.bound_symbol import BoundSymbol
+from xcsframework.xcsr.bound_symbol import BoundSymbol
 
 
 class CenterSpreadSymbol(BoundSymbol):

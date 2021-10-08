@@ -3,24 +3,24 @@ from typing import List
 
 
 class TestPerformanceComponent(TestCase):
-    from xcs_framework.xcs.condition import Condition
+    from xcsframework.xcs.condition import Condition
 
     conditions: List[Condition[str]] = []
 
     @classmethod
     def setUpClass(cls) -> None:
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.symbol import Symbol, WildcardSymbol
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.symbol import Symbol, WildcardSymbol
         cls.conditions.append(Condition([Symbol('1'), WildcardSymbol(), Symbol('1')]))
         cls.conditions.append(Condition([Symbol('0'), WildcardSymbol(), Symbol('1')]))
         cls.conditions.append(Condition([Symbol('0'), Symbol('1'), Symbol('1')]))
 
     def test_generate_match_set(self):
-        from xcs_framework.xcs.classifier_sets import Population, MatchSet
-        from xcs_framework.xcs.classifier import Classifier
-        from xcs_framework.xcs.components.performance import PerformanceComponent
-        from xcs_framework.xcs.state import State
-        from .stubs import SubsumptionStub
+        from xcsframework.xcs.classifier_sets import Population, MatchSet
+        from xcsframework.xcs.classifier import Classifier
+        from xcsframework.xcs.components.performance import PerformanceComponent
+        from xcsframework.xcs.state import State
+        from tests.stubs import SubsumptionStub
 
         state: State[str] = State(['1', '0', '1'])
         cl1: Classifier[str, int] = Classifier(self.conditions[0], 1)

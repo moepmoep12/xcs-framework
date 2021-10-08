@@ -5,10 +5,10 @@ from random import shuffle, choice
 from sys import float_info
 from dataclasses import dataclass
 
-from xcs_framework.xcs.classifier_sets import MatchSet, Population
-from xcs_framework.xcs.state import State
-from xcs_framework.xcs.components.covering import ICoveringComponent
-from xcs_framework.xcs.exceptions import WrongSubTypeException
+from xcsframework.xcs.classifier_sets import MatchSet, Population
+from xcsframework.xcs.state import State
+from xcsframework.xcs.components.covering import ICoveringComponent
+from xcsframework.xcs.exceptions import WrongSubTypeException
 
 # The data type for symbols
 SymbolType = TypeVar('SymbolType')

@@ -2,7 +2,7 @@ from abc import abstractmethod
 from numbers import Number
 from overrides import overrides
 
-from xcs_framework.xcs.symbol import ISymbol
+from xcsframework.xcs.symbol import ISymbol
 
 
 class BoundSymbol(ISymbol[Number]):

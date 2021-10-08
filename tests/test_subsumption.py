@@ -3,8 +3,8 @@ from unittest import TestCase
 
 class TestSubsumptionCriteriaExperiencePrecision(TestCase):
     def test_min_exp(self):
-        from xcs_framework.xcs.subsumption import SubsumptionCriteriaExperiencePrecision
-        from xcs_framework.xcs.exceptions import OutOfRangeException
+        from xcsframework.xcs.subsumption import SubsumptionCriteriaExperiencePrecision
+        from xcsframework.xcs.exceptions import OutOfRangeException
         sub_criteria = SubsumptionCriteriaExperiencePrecision(0, 0)
         sub_criteria.min_exp = 2
 
@@ -20,8 +20,8 @@ class TestSubsumptionCriteriaExperiencePrecision(TestCase):
             sub_criteria.min_exp = 'a'
 
     def test_max_epsilon(self):
-        from xcs_framework.xcs.subsumption import SubsumptionCriteriaExperiencePrecision
-        from xcs_framework.xcs.exceptions import OutOfRangeException
+        from xcsframework.xcs.subsumption import SubsumptionCriteriaExperiencePrecision
+        from xcsframework.xcs.exceptions import OutOfRangeException
         sub_criteria = SubsumptionCriteriaExperiencePrecision(0, 0)
         sub_criteria.max_epsilon = 1.0
 
@@ -37,11 +37,11 @@ class TestSubsumptionCriteriaExperiencePrecision(TestCase):
             sub_criteria.max_epsilon = 'a'
 
     def test_can_subsume(self):
-        from xcs_framework.xcs.subsumption import SubsumptionCriteriaExperiencePrecision
-        from xcs_framework.xcs.condition import Condition
-        from xcs_framework.xcs.classifier import Classifier
-        from xcs_framework.xcs.symbol import WildcardSymbol, Symbol
-        from xcs_framework.xcs.exceptions import WrongSubTypeException
+        from xcsframework.xcs.subsumption import SubsumptionCriteriaExperiencePrecision
+        from xcsframework.xcs.condition import Condition
+        from xcsframework.xcs.classifier import Classifier
+        from xcsframework.xcs.symbol import WildcardSymbol, Symbol
+        from xcsframework.xcs.exceptions import WrongSubTypeException
         min_exp = 10
         max_epsilon = 5.0
         sub_criteria = SubsumptionCriteriaExperiencePrecision(min_exp=min_exp, max_epsilon=max_epsilon)
