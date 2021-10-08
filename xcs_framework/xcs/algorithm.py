@@ -88,9 +88,6 @@ class XCS(Generic[SymbolType, ActionType]):
 
         assert (not self._expects_reward)
 
-        if 0 < self._xcs_constants.max_iterations < self._iteration:
-            return
-
         match_set = self._performance_component.generate_match_set(population=self._population, state=state)
 
         chosen_action: ChosenAction = self._performance_component.choose_action(match_set=match_set,

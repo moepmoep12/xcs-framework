@@ -12,29 +12,32 @@ The constants (hyper parameters), their names and default values are based upon 
 
 
 class XCSConstants:
-    def __init__(self, max_iterations: int = 0, gamma: float = 0.71, do_learning_subsumption: bool = True,
-                 do_discovery_subsumption: bool = True):
+    def __init__(self,
+                 gamma: Number = 0.71,
+                 do_learning_subsumption: bool = True,
+                 do_discovery_subsumption: bool = True,
+                 subsumption_tolerance: Number = 0):
         """
-        :param max_iterations: Maximum iterations performed where 0 means unbound.
         :param gamma: The discount factor of future rewards.
         :param do_learning_subsumption: Whether subsumption will be tested after learning updates.
         :param do_discovery_subsumption: Whether subsumption will be tested after rule discovery.
+        :param subsumption_tolerance: The tolerance when testing for subsumption.
         """
 
-        self.max_iterations = max_iterations
         self.gamma = gamma
         self.do_learning_subsumption = do_learning_subsumption
         self.do_discovery_subsumption = do_discovery_subsumption
+        self.subsumption_tolerance = subsumption_tolerance
 
     @property
-    def gamma(self) -> int:
+    def gamma(self) -> Number:
         """
         :return: The discount factor of future rewards.
         """
         return self._gamma
 
     @gamma.setter
-    def gamma(self, value: int):
+    def gamma(self, value: Number):
         """
         :param value: Float in range [0, inf].
         : raises:
@@ -44,25 +47,6 @@ class XCSConstants:
             raise OutOfRangeException(0.0, inf, value)
 
         self._gamma = value
-
-    @property
-    def max_iterations(self) -> int:
-        """
-        :return: Maximum iterations performed where 0 means unbound.
-        """
-        return self._max_iterations
-
-    @max_iterations.setter
-    def max_iterations(self, value: int):
-        """
-        :param value: Int in range [0, inf].
-        : raises:
-            OutOfRangeException: If value is not an int in range [0, inf].
-        """
-        if not isinstance(value, Number) or value < 0:
-            raise OutOfRangeException(0.0, inf, value)
-
-        self._max_iterations = value
 
     @property
     def do_learning_subsumption(self):
@@ -102,6 +86,25 @@ class XCSConstants:
 
         self._do_discovery_subsumption = value
 
+    @property
+    def subsumption_tolerance(self) -> Number:
+        """
+        :return: The tolerance when testing for subsumption.
+        """
+        return self._subsumption_tolerance
+
+    @subsumption_tolerance.setter
+    def subsumption_tolerance(self, value: Number):
+        """
+        :param value: The tolerance when testing for subsumption. Number > 0.
+        : raises:
+            OutOfRangeException: If value is not an int in range [0, inf].
+        """
+        if not isinstance(value, Number) or value < 0.0:
+            raise OutOfRangeException(0.0, inf, value)
+
+        self._subsumption_tolerance = value
+
 
 class SymbolConstants:
     """
@@ -135,30 +138,30 @@ class ClassifierConstants:
     """
 
     def __init__(self,
-                 fitness_init: float = float_info.epsilon,
-                 prediction_init: float = float_info.epsilon,
-                 epsilon_init: float = float_info.epsilon
+                 fitness_init: Number = float_info.epsilon,
+                 prediction_init: Number = float_info.epsilon,
+                 epsilon_init: Number = float_info.epsilon
                  ):
         self._fitness_init = fitness_init
         self._prediction_init = prediction_init
         self._epsilon_init = epsilon_init
 
     @property
-    def fitness_init(self) -> float:
+    def fitness_init(self) -> Number:
         """
         :return: Initial fitness value for a new classifier.
         """
         return self._fitness_init
 
     @property
-    def prediction_init(self) -> float:
+    def prediction_init(self) -> Number:
         """
         :return: Initial prediction value for a new classifier.
         """
         return self._prediction_init
 
     @property
-    def epsilon_init(self) -> float:
+    def epsilon_init(self) -> Number:
         """
         :return: Initial epsilon value for a new classifier.
         """
@@ -170,7 +173,7 @@ class PopulationConstants:
     Groups constants used for the population of a XCS.
     """
 
-    def __init__(self, theta_del: int = 25, delta: float = 0.1):
+    def __init__(self, theta_del: int = 25, delta: Number = 0.1):
         """
         :param theta_del: Minimum experience required for a classifier to use its fitness in deletion probability.
         :param delta: The fraction of the mean fitness of the population below which the fitness of a classifier will be
@@ -199,7 +202,7 @@ class PopulationConstants:
         self._theta_del = value
 
     @property
-    def delta(self) -> float:
+    def delta(self) -> Number:
         """
         :return: The fraction of the mean fitness of the population below which the fitness of a classifier will be
                  considered in its deletion probability. In range [0.0, inf]
@@ -207,7 +210,7 @@ class PopulationConstants:
         return self._delta
 
     @delta.setter
-    def delta(self, value: float):
+    def delta(self, value: Number):
         """
         :param value: Float in range [0.0, inf].
         : raises:
@@ -224,7 +227,7 @@ class LearningConstants:
     Groups constants used for learning in a XCS.
     """
 
-    def __init__(self, beta: float = 0.2, epsilon_zero: float = float_info.epsilon):
+    def __init__(self, beta: Number = 0.2, epsilon_zero: Number = float_info.epsilon):
         """
         :param beta: The learning rate in range ]0.0, inf].
         :param epsilon_zero: Error threshold under which a classifier is considered 100% accurate. In range [0.0, inf].
@@ -234,14 +237,14 @@ class LearningConstants:
         self.epsilon_zero = epsilon_zero
 
     @property
-    def beta(self) -> float:
+    def beta(self) -> Number:
         """
         :return: The learning rate in range ]0.0, inf].
         """
         return self._beta
 
     @beta.setter
-    def beta(self, value: float):
+    def beta(self, value: Number):
         """
         :param value: Float in range ]0.0, inf].
         : raises:
@@ -253,7 +256,7 @@ class LearningConstants:
         self._beta = value
 
     @property
-    def epsilon_zero(self) -> float:
+    def epsilon_zero(self) -> Number:
         """
         :return: Error threshold under which a classifier is considered 100% accurate. In range [0.0, inf].
                  Should be ~1% of maximum possible reward.
@@ -261,7 +264,7 @@ class LearningConstants:
         return self._epsilon_zero
 
     @epsilon_zero.setter
-    def epsilon_zero(self, value: float):
+    def epsilon_zero(self, value: Number):
         """
         :param value: float in range [0.0, inf].
         : raises:
@@ -278,7 +281,7 @@ class FitnessConstants:
     Groups constants used for fitness update in a XCS.
     """
 
-    def __init__(self, alpha: float = 0.1, nu: int = 5):
+    def __init__(self, alpha: Number = 0.1, nu: int = 5):
         """
         :param alpha: The learning rate for fitness updates in range ]0.0, inf].
         :param nu: The exponent for fitness updates in range ]0.0, inf].
@@ -287,14 +290,14 @@ class FitnessConstants:
         self.nu = nu
 
     @property
-    def alpha(self) -> float:
+    def alpha(self) -> Number:
         """
         :return: The learning rate for fitness updates in range ]0.0, inf].
         """
         return self._alpha
 
     @alpha.setter
-    def alpha(self, value: float):
+    def alpha(self, value: Number):
         """
         :param value: Float in range ]0.0, inf].
         : raises:
@@ -339,10 +342,10 @@ class GAConstants:
         TWO_POINT = 3
 
     def __init__(self,
-                 mutation_rate: float = 0.03,
-                 mutate_action: bool = False,
-                 fitness_reduction: float = 0.1,
-                 crossover_probability: float = 0.5,
+                 mutation_rate: Number = 0.03,
+                 mutate_action: Number = False,
+                 fitness_reduction: Number = 0.1,
+                 crossover_probability: Number = 0.5,
                  ga_threshold: int = 25,
                  crossover_method: CrossoverMethod = CrossoverMethod.TWO_POINT):
         """
@@ -363,14 +366,14 @@ class GAConstants:
         self.crossover_method = crossover_method
 
     @property
-    def mutation_rate(self) -> float:
+    def mutation_rate(self) -> Number:
         """
         :return: The rate of mutation when discovering new classifier. In range [0.0, 1.0].
         """
         return self._mutation_rate
 
     @mutation_rate.setter
-    def mutation_rate(self, value: float):
+    def mutation_rate(self, value: Number):
         """
         :param value: The value of the rate of mutation as a float in range [0.0, 1.0].
         :raises:
@@ -400,7 +403,7 @@ class GAConstants:
         self._mutate_action = value
 
     @property
-    def fitness_reduction(self) -> float:
+    def fitness_reduction(self) -> Number:
         """
         :return: The percentage reduction of the fitness of a child classifier when created without crossover.
                  In range [0.0, 1.0].
@@ -408,7 +411,7 @@ class GAConstants:
         return self._fitness_reduction
 
     @fitness_reduction.setter
-    def fitness_reduction(self, value: float):
+    def fitness_reduction(self, value: Number):
         """
         :param value: Float in range [0.0, 1.0].
         : raises:
@@ -420,14 +423,14 @@ class GAConstants:
         self._fitness_reduction = value
 
     @property
-    def crossover_probability(self) -> float:
+    def crossover_probability(self) -> Number:
         """
         :return: The chance in the range [0.0, 1.0] for doing crossover in classifier discovery.
         """
         return self._crossover_probability
 
     @crossover_probability.setter
-    def crossover_probability(self, value: float):
+    def crossover_probability(self, value: Number):
         """
         :param value: Float in range [0.0, 1.0].
         : raises:
@@ -482,21 +485,21 @@ class CoveringConstants:
     Groups constants used in a covering component.
     """
 
-    def __init__(self, wild_card_probability: float = 0.33):
+    def __init__(self, wild_card_probability: Number = 0.33):
         """
         :param wild_card_probability: Must be number in range [0.0, 1.0].
         """
         self.wildcard_probability = wild_card_probability
 
     @property
-    def wildcard_probability(self) -> float:
+    def wildcard_probability(self) -> Number:
         """
         :return: The probability for a symbol to become a wildcard.
         """
         return self._wildcard_probability
 
     @wildcard_probability.setter
-    def wildcard_probability(self, value: float):
+    def wildcard_probability(self, value: Number):
         """
         :param value: The probability for a symbol to become a wildcard. Number in range [0.0, 1.0].
         :raises:
