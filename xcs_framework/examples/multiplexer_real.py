@@ -23,15 +23,18 @@ class MultiplexerRealEnvironment(IEnvironment):
     Encapsulates the Multiplexer problem in an environment.
     """
 
-    def __init__(self, length: int, address_length: int, reward: Number, min_value: Number, max_value: Number,
+    def __init__(self, length: int, reward: Number, min_value: Number, max_value: Number,
                  theta: Number):
         self._length = length
-        self._address_length = address_length
+        self._address_length = self._get_adress_length(length, 0)
         self._reward = reward
         self._min_value = min_value
         self._max_value = max_value
         self._theta = theta
         self._current_state = None
+
+        # length has to be n + 2^n
+        assert self._length == self._address_length + (1 << self._address_length)
 
     def get_state(self) -> State[float]:
         """
@@ -69,6 +72,9 @@ class MultiplexerRealEnvironment(IEnvironment):
     def _apply_theta(self, value: Number) -> int:
         return 0 if value < self._theta else 1
 
+    def _get_adress_length(self, l: int, c: int):
+        return c - 1 if l == 0 else self._get_adress_length(l >> 1, c + 1)
+
 
 def print_population(population, amount: int = 0):
     """
@@ -105,9 +111,6 @@ def test_data(xcs, environment, metrics, iterations):
 # ---------------------------------------------------------------------------------------------------------------------
 # PROBLEM PARAMETERS
 #
-# how many bits are used for representing the address
-ADDRESS_LENGTH = 2
-
 # the length of the input. larger inputs lead to increased runtime and complexity
 INPUT_LENGTH = 6
 
@@ -157,22 +160,29 @@ FITNESS_ALPHA = 0.3
 # mutate action in the GA. this leads to better results in this example
 MUTATE_ACTION = True
 
+# whether bounds will be truncated into range [min_value, max_value]
+TRUNCATE_TO_RANGE = True
+
 # ---------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     # 1. creating the environment
-    environment = MultiplexerRealEnvironment(length=INPUT_LENGTH, address_length=ADDRESS_LENGTH, reward=MAX_REWARD,
+    environment = MultiplexerRealEnvironment(length=INPUT_LENGTH, reward=MAX_REWARD,
                                              min_value=MIN_VALUE, max_value=MAX_VALUE, theta=THETA)
 
     # 2. instantiating constants (hyper parameters) and customizing values
     learning_constants = LearningConstants(epsilon_zero=EPSILON_ZERO)
     fitness_constants = FitnessConstants(alpha=FITNESS_ALPHA)
-    covering_constants = XCSRCoveringConstants(max_spread=THETA)
+    covering_constants = XCSRCoveringConstants(max_spread=THETA,
+                                               min_value=MIN_VALUE,
+                                               max_value=MAX_VALUE,
+                                               truncate_to_range=TRUNCATE_TO_RANGE)
     ga_constants = GAConstants(crossover_probability=CROSSOVER_PROBABILITY,
                                mutate_action=MUTATE_ACTION)
     ga_constants_r = XCSRGAConstants(ga_constants=ga_constants,
                                      min_value=MIN_VALUE,
-                                     max_value=MAX_VALUE)
+                                     max_value=MAX_VALUE,
+                                     truncate_to_range=TRUNCATE_TO_RANGE)
 
     # 3. creating xcs components
     covering_component = CSCoveringComponent(covering_constants=covering_constants)

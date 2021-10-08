@@ -1,5 +1,6 @@
 """
-A simple example where the XCS shall learn the 6bit Multiplexer. This is a single step problem.
+A simple example where the XCS shall learn the n-bit Multiplexer. This is a single step problem.
+The example below uses the 6-bit multiplexer.
 Given an input X = [n_0, ..., n_5] the output should be 0 or 1. The first two bits of X, that is n_0, n_1, serve as
 address pointing to one of the remaining bits of X. For example given the input X = [0,1,1,0,1,0] the first two bits
 form the binary number '01'. So the output should be X[offset + '01'] = X[2 + 1] = X[3] =  0,
@@ -19,11 +20,14 @@ class MultiplexerEnvironment(IEnvironment):
     Encapsulates the Multiplexer problem in an environment.
     """
 
-    def __init__(self, length: int, address_length: int, reward: Number):
+    def __init__(self, length: int, reward: Number):
         self._length = length
-        self._address_length = address_length
+        self._address_length = self._get_adress_length(length, 0)
         self._reward = reward
         self._current_state = None
+
+        # length has to be n + 2^n
+        assert self._length == self._address_length + (1 << self._address_length)
 
     def get_state(self) -> State[int]:
         """
@@ -54,6 +58,9 @@ class MultiplexerEnvironment(IEnvironment):
         """
         address = int(f"{state[0]}{state[1]}", 2)
         return state[self._address_length + address]
+
+    def _get_adress_length(self, l: int, c: int):
+        return c - 1 if l == 0 else self._get_adress_length(l >> 1, c + 1)
 
 
 def print_population(population, amount: int = 0):
@@ -91,9 +98,6 @@ def test_data(xcs, environment, metrics, iterations):
 # ---------------------------------------------------------------------------------------------------------------------
 # PROBLEM PARAMETERS
 #
-# how many bits are used for representing the address
-ADDRESS_LENGTH = 2
-
 # the length of the input. larger inputs lead to increased runtime and complexity
 INPUT_LENGTH = 6
 
@@ -136,7 +140,7 @@ FITNESS_ALPHA = 0.3
 
 if __name__ == '__main__':
     # 1. creating the environment
-    environment = MultiplexerEnvironment(INPUT_LENGTH, ADDRESS_LENGTH, MAX_REWARD)
+    environment = MultiplexerEnvironment(INPUT_LENGTH, MAX_REWARD)
 
     # 2. instantiating constants (hyper parameters) and customizing values
     # we only instantiate those constants of which we use different values than default
