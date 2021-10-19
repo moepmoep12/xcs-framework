@@ -10,6 +10,7 @@ where offset = 2 because we use two bits for the address.
 """
 
 import random
+import copy
 from typing import List
 
 from xcsframework.xcs import *
@@ -91,7 +92,7 @@ def print_population(population, amount: int = 0):
         print(f"   {cl}")
 
 
-def test_data(xcs, environment, metrics, iterations):
+def validate(xcs, environment, metrics, iterations):
     predictions = [None] * iterations
     actual = [None] * iterations
     metric_scores = []
@@ -126,10 +127,10 @@ MAX_VALUE = 1.0
 #
 # how many learning iterations will be done
 # after how many training iterations validation will be done
-BATCH_SIZE = 1000
+BATCH_SIZE = 200
 
 # how many epochs will be done. total iterations = epochs * batch_size
-EPOCHS = 20
+EPOCHS = 100
 
 # size of validation data
 VALIDATION_SIZE = 50
@@ -147,21 +148,31 @@ MAX_REWARD = 100
 EPSILON_ZERO = MAX_REWARD / 100
 
 # maximum classifier count
-POPULATION_SIZE = 800
+POPULATION_SIZE = 700
 
-CROSSOVER_PROBABILITY = 0.8
+# probability for doing crossover in GA
+CROSSOVER_PROBABILITY = 0.7
 
-# a bit higher than the default
-LEARNING_RATE = 0.2
+# what kind of crossover method to use in GA
+CROSSOVER_METHOD = GAConstants.CrossoverMethod.UNIFORM
+
+# whether bounds will be truncated into range [min_value, max_value]
+TRUNCATE_TO_RANGE = True
+
+# learning rate in parameter update
+LEARNING_RATE = 0.03
 
 # fitness parameter for updating values
-FITNESS_ALPHA = 0.3
+FITNESS_ALPHA = 0.03
 
 # mutate action in the GA. this leads to better results in this example
 MUTATE_ACTION = True
 
-# whether bounds will be truncated into range [min_value, max_value]
-TRUNCATE_TO_RANGE = True
+# probability of mutations
+MUTATION_RATE = 0.05
+
+# how much mutation changes the value at most
+MAX_MUTATION_CHANGE = THETA
 
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -171,18 +182,21 @@ if __name__ == '__main__':
                                              min_value=MIN_VALUE, max_value=MAX_VALUE, theta=THETA)
 
     # 2. instantiating constants (hyper parameters) and customizing values
-    learning_constants = LearningConstants(epsilon_zero=EPSILON_ZERO)
+    learning_constants = LearningConstants(beta=LEARNING_RATE, epsilon_zero=EPSILON_ZERO)
     fitness_constants = FitnessConstants(alpha=FITNESS_ALPHA)
     covering_constants = XCSRCoveringConstants(max_spread=THETA,
                                                min_value=MIN_VALUE,
                                                max_value=MAX_VALUE,
                                                truncate_to_range=TRUNCATE_TO_RANGE)
     ga_constants = GAConstants(crossover_probability=CROSSOVER_PROBABILITY,
-                               mutate_action=MUTATE_ACTION)
+                               mutate_action=MUTATE_ACTION,
+                               mutation_rate=MUTATION_RATE,
+                               crossover_method=CROSSOVER_METHOD)
     ga_constants_r = XCSRGAConstants(ga_constants=ga_constants,
                                      min_value=MIN_VALUE,
                                      max_value=MAX_VALUE,
-                                     truncate_to_range=TRUNCATE_TO_RANGE)
+                                     truncate_to_range=TRUNCATE_TO_RANGE,
+                                     max_mutation_change=MAX_MUTATION_CHANGE)
 
     # 3. creating xcs components
     covering_component = CSCoveringComponent(covering_constants=covering_constants)
@@ -209,19 +223,31 @@ if __name__ == '__main__':
     # 5.training
     trainer = TrainerEnvironment()
     accuracy_metric = Accuracy()
+    best_population = xcs.population
+    best_acc = 0
 
     print(f"Starting to learn the {INPUT_LENGTH}-bit Multiplexer...")
 
     for epoch in range(EPOCHS):
         trainer.optimize(xcs=xcs, environment=environment, training_iterations=BATCH_SIZE)
         # validation
-        metric_scores_epoch = test_data(xcs, environment, [accuracy_metric], VALIDATION_SIZE)
+        metric_scores_epoch = validate(xcs, environment, [accuracy_metric], VALIDATION_SIZE)
+
+        # remember best population according to validation
+        accuracy = metric_scores_epoch[0][1]
+        if accuracy > best_acc:
+            best_acc = accuracy
+            best_population = copy.deepcopy(xcs.population)
+
         print(f"\rEpoch {epoch + 1}/{EPOCHS} --- Metrics: {metric_scores_epoch}")
 
+    print(f"Best average accuracy: {best_acc*100:.2f}%")
+
     # output the population
+    xcs._population = best_population
     print_population(xcs.population, 20)
 
     # 6. testing
-    test_accuracy = test_data(xcs, environment, [accuracy_metric], TESTING_SIZE)
+    test_accuracy = validate(xcs, environment, [accuracy_metric], TESTING_SIZE)
 
     print(f"\nTesting Accuracy: {test_accuracy[0]} on {TESTING_SIZE} samples.")

@@ -94,7 +94,7 @@ INPUT_LENGTH = 5
 # TRAINING PARAMETERS
 #
 # after how many training iterations validation will be done
-BATCH_SIZE = 200
+BATCH_SIZE = 500
 
 # how many epochs will be done. total iterations = epochs * batch_size
 EPOCHS = 20

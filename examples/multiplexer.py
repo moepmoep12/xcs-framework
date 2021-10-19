@@ -54,7 +54,7 @@ class MultiplexerEnvironment(IEnvironment):
 
     def _get_expected_action(self, state) -> int:
         """
-        :return: 6-bit Multiplexer applied to the state.
+        :return: n-bit Multiplexer applied to the state.
         """
         address = int(f"{state[0]}{state[1]}", 2)
         return state[self._address_length + address]
@@ -78,7 +78,7 @@ def print_population(population, amount: int = 0):
         print(f"   {cl}")
 
 
-def test_data(xcs, environment, metrics, iterations):
+def validate(xcs, environment, metrics, iterations):
     predictions = [None] * iterations
     actual = [None] * iterations
     metric_scores = []
@@ -163,16 +163,6 @@ if __name__ == '__main__':
     population = Population(max_size=POPULATION_SIZE,
                             subsumption_criteria=subsumption_criteria)
 
-    xcs: XCS[str, int] = XCS(population=population,
-                             performance_component=performance_component,
-                             discovery_component=discovery_component,
-                             learning_component=learning_component,
-                             available_actions=environment.get_available_actions())
-
-    # 4. initialize empty population
-    population = Population(max_size=POPULATION_SIZE,
-                            subsumption_criteria=subsumption_criteria)
-
     xcs: XCS[int, int] = XCS(population=population,
                              performance_component=performance_component,
                              discovery_component=discovery_component,
@@ -188,13 +178,13 @@ if __name__ == '__main__':
     for epoch in range(EPOCHS):
         trainer.optimize(xcs=xcs, environment=environment, training_iterations=BATCH_SIZE)
         # validation
-        metric_scores_epoch = test_data(xcs, environment, [accuracy_metric], VALIDATION_SIZE)
+        metric_scores_epoch = validate(xcs, environment, [accuracy_metric], VALIDATION_SIZE)
         print(f"\rEpoch {epoch + 1}/{EPOCHS} --- Metrics: {metric_scores_epoch}")
 
     # output the population
     print_population(xcs.population, 20)
 
     # 6. testing
-    test_accuracy = test_data(xcs, environment, [accuracy_metric], TESTING_SIZE)
+    test_accuracy = validate(xcs, environment, [accuracy_metric], TESTING_SIZE)
 
     print(f"\nTesting Accuracy: {test_accuracy[0]} on {TESTING_SIZE} samples.")
