@@ -79,3 +79,8 @@ class F1(Metric):
 
     def __repr__(self) -> str:
         return "F1"
+
+
+def average_reward(reward_history) -> float:
+    reward_sum_epoch = [np.sum(reward_epoch) for reward_epoch in reward_history]
+    return np.average(reward_sum_epoch) if len(reward_sum_epoch) > 0 else 0

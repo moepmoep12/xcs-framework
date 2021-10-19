@@ -218,6 +218,8 @@ class GeneticAlgorithm(IDiscoveryComponent):
         cl1.fitness *= self.ga_constants.fitness_reduction
         cl2.fitness *= self.ga_constants.fitness_reduction
 
+        return did_crossover
+
     def _uniform_crossover(self,
                            cl1: Classifier[SymbolType, ActionType],
                            cl2: Classifier[SymbolType, ActionType]) -> bool:
@@ -236,7 +238,7 @@ class GeneticAlgorithm(IDiscoveryComponent):
                              cl2: Classifier[SymbolType, ActionType]) -> bool:
 
         from_index = random.randint(0, len(cl1.condition) - 1)
-        return self._swap_symbols(cl1.condition, cl2.condition, from_index, len(cl1.condition))
+        return self._swap_symbols(cl1.condition, cl2.condition, from_index, len(cl1.condition) - 1)
 
     def _two_point_crossover(self,
                              cl1: Classifier[SymbolType, ActionType],
