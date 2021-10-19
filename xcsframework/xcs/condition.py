@@ -1,4 +1,4 @@
-from .symbol import ISymbol, WildcardSymbol
+from .symbol import ISymbol, ComparisonResult
 from .state import State
 from .exceptions import EmptyCollectionException, WrongSubTypeException, OutOfRangeException, WrongStrictTypeException
 
@@ -62,11 +62,11 @@ class Condition(Generic[SymbolType]):
         result = False
 
         for i in range(len(self.condition)):
-            if self.condition[i] != other.condition[i]:
-                if not isinstance(self.condition[i], WildcardSymbol):
-                    return False
-                else:
-                    result = True
+            compare_result = self.condition[i].compare(other.condition[i])
+            if compare_result == ComparisonResult.LESS_GENERAL:
+                return False
+            if compare_result == ComparisonResult.MORE_GENERAL:
+                result = True
 
         return result
 
