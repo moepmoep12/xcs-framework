@@ -7,7 +7,7 @@ The XCS implementation is based upon Butz & Wilsons paper "An algorithmic descri
 The real valued implementation is based upon Stone & Bull's paper "For Real! XCS with Continuous-Valued Inputs" (DOI: [10.1162/106365603322365315](http://www.mitpressjournals.org/doi/10.1162/106365603322365315) ) & Wilson's paper "Get Real! XCS with Continuous-Valued Inputs" (DOI: [10.1007/3-540-45027-0_11](https://link.springer.com/chapter/10.1007/3-540-45027-0_11)).
 
 
-For more information about the framework and XCS refer to the [wiki](home).
+For more information about the framework and XCS refer to the [wiki](`xcs-python-framework/-/wikis/home`).
 
 # Install
 The framework can be installed as a library. Note that it requires at least **python version 3.8**.  In order to do so run the following command in the root folder of this repository (where setup.py is located):
