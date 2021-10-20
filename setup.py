@@ -12,6 +12,7 @@ setup(
     author='Andreas Schmidt',
     author_email='moepmoep12@gmail.com',
     packages=find_packages(exclude="tests"),
+    python_requires='>=3.8.0',
     include_package_data=True,
     install_requires=["overrides", "numpy"]
 )
