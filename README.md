@@ -19,12 +19,12 @@ After xcsframework has been installed, one can run the examples found in the exa
 Where EXAMPLE_NAME is the name of the example/file. Alternatively one can also use absolute paths.
 
 ## XOR example
-This example demonstrates how a XCS can be used to learn a variant of the XOR function. The file can be found [here](https://gitlab2.informatik.uni-wuerzburg.de/s341981/xcs-python-framework/-/blob/master/examples/xor.py). The process will be output to the console. The training should be done within 10s and the accuracy should reach 100%. If not, simply run again. 
+This example demonstrates how a XCS can be used to learn a variant of the XOR function. The file can be found [here](examples/xor.py). The process will be output to the console. The training should be done within 10s and the accuracy should reach 100%. If not, simply run again. 
 
 ## Multiplexer example
-There are two examples for the multiplexer problem. One uses a [binary representation](https://gitlab2.informatik.uni-wuerzburg.de/s341981/xcs-python-framework/-/blob/master/examples/multiplexer.py) and the other uses [real values](https://gitlab2.informatik.uni-wuerzburg.de/s341981/xcs-python-framework/-/blob/master/examples/multiplexer_real.py). At default the 6-bit Multiplexer will be used. The XCS should reach 100% accuracy on the binary representation. The real valued version should obtain an accuary of >= 80%.
+There are two examples for the multiplexer problem. One uses a [binary representation](examples/multiplexer.py) and the other uses [real values](examples/multiplexer_real.py). At default the 6-bit Multiplexer will be used. The XCS should reach 100% accuracy on the binary representation. The real valued version should obtain an accuary of >= 80%.
 
-This example is also available as a [jupyter notebook](https://gitlab2.informatik.uni-wuerzburg.de/s341981/xcs-python-framework/-/blob/master/notebooks/multiplexer.ipynb).
+This example is also available as a [jupyter notebook](notebooks/multiplexer.ipynb).
 
 ## Cartpole example
 This example uses the [gym environment](https://gym.openai.com/). In order to run this example you have to first install gym:
