@@ -41,7 +41,7 @@ class TrainerEnvironment:
                 reward_history.append(reward_epoch)
                 reward_epoch = []
 
-            sys.stdout.write(f"\rIteration {iteration + 1}/{training_iterations}")
-            sys.stdout.flush()
+            # sys.stdout.write(f"\rIteration {iteration + 1}/{training_iterations}")
+            # sys.stdout.flush()
 
         return reward_history

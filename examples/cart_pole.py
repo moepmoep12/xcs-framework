@@ -114,13 +114,13 @@ MAX_VALUE = 1.0
 # TRAINING PARAMETERS
 #
 # after how many training iterations validation will be done
-BATCH_SIZE = 190
+BATCH_SIZE = 195
 
 # how many epochs will be done. total iterations = epochs * batch_size
 EPOCHS = 200
 
 # validation size
-VALIDATION_SIZE = 190
+VALIDATION_SIZE = 195
 
 # the reward received for correct classification
 MAX_REWARD = 1
