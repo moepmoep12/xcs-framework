@@ -6,6 +6,9 @@ The XCS implementation is based upon Butz & Wilsons paper "An algorithmic descri
 
 The real valued implementation is based upon Stone & Bull's paper "For Real! XCS with Continuous-Valued Inputs" (DOI: [10.1162/106365603322365315](http://www.mitpressjournals.org/doi/10.1162/106365603322365315) ) & Wilson's paper "Get Real! XCS with Continuous-Valued Inputs" (DOI: [10.1007/3-540-45027-0_11](https://link.springer.com/chapter/10.1007/3-540-45027-0_11)).
 
+
+For more information about the framework and XCS refer to the [wiki](https://gitlab2.informatik.uni-wuerzburg.de/s341981/xcs-python-framework/-/wikis/home).
+
 # Install
 The framework can be installed as a library. Note that it requires at least **python version 3.8**.  In order to do so run the following command in the root folder of this repository (where setup.py is located):
 
@@ -19,12 +22,12 @@ After xcsframework has been installed, one can run the examples found in the exa
 Where EXAMPLE_NAME is the name of the example/file. Alternatively one can also use absolute paths.
 
 ## XOR example
-This example demonstrates how a XCS can be used to learn a variant of the XOR function. The file can be found [here](https://gitlab2.informatik.uni-wuerzburg.de/s341981/xcs-python-framework/-/blob/master/examples/xor.py). The process will be output to the console. The training should be done within 10s and the accuracy should reach 100%. If not, simply run again. 
+This example demonstrates how a XCS can be used to learn a variant of the XOR function. The file can be found [here](examples/xor.py). The process will be output to the console. The training should be done within 10s and the accuracy should reach 100%. If not, simply run again. 
 
 ## Multiplexer example
-There are two examples for the multiplexer problem. One uses a [binary representation](https://gitlab2.informatik.uni-wuerzburg.de/s341981/xcs-python-framework/-/blob/master/examples/multiplexer.py) and the other uses [real values](https://gitlab2.informatik.uni-wuerzburg.de/s341981/xcs-python-framework/-/blob/master/examples/multiplexer_real.py). At default the 6-bit Multiplexer will be used. The XCS should reach 100% accuracy on the binary representation. The real valued version should obtain an accuary of >= 80%.
+There are two examples for the multiplexer problem. One uses a [binary representation](examples/multiplexer.py) and the other uses [real values](examples/multiplexer_real.py). At default the 6-bit Multiplexer will be used. The XCS should reach 100% accuracy on the binary representation. The real valued version should obtain an accuary of >= 80%.
 
-This example is also available as a [jupyter notebook](https://gitlab2.informatik.uni-wuerzburg.de/s341981/xcs-python-framework/-/blob/master/notebooks/multiplexer.ipynb).
+This example is also available as a [jupyter notebook](notebooks/multiplexer.ipynb).
 
 ## Cartpole example
 This example uses the [gym environment](https://gym.openai.com/). In order to run this example you have to first install gym:
